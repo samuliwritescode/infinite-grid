@@ -1,0 +1,196 @@
+<!-- Dependency resources -->
+<link rel="import" href="../bower_components/polymer/polymer-element.html">
+
+<dom-module id="infinite-grid">
+    <template>
+        <style>
+            :host {
+                width: 100%;
+                height: 100%;
+                padding: 0;
+                margin: 0;
+            }
+
+            .scrollarea {
+                width: 100%;
+                height: 100%;
+                padding: 0;
+                margin: 0;
+                overflow: auto;
+            }
+
+            .container {
+                height: 10000px;
+                width: 10000px;
+                padding: 0;
+                margin: 0;
+                overflow: hidden;
+                position: relative;
+            }
+
+            .storage {
+                display: none;
+            }
+
+            .row {
+                display: block;
+                white-space: nowrap;
+                position: absolute;
+            }
+
+            .cell {
+                overflow: hidden;
+                display: inline-block;
+                width: 100px;
+                height: 100px;
+                box-sizing: border-box;
+                position: absolute;
+                border-style: solid;
+                border-width: 1px;
+            }
+        </style>
+        <div id="scrollarea" class="scrollarea">
+            <div id="container" class="container"></div>
+        </div>
+
+        <div id="storage" class="storage"></div>
+    </template>
+
+    <script>
+        class InfiniteGrid extends Polymer.Element {
+            static get is() {
+                return 'infinite-grid'
+            }
+
+            ready() {
+                super.ready();
+                this.bufferX = 10;
+                this.bufferY = 10;
+                this.prePosX = 0;
+                this.prePosY = 0;
+
+                var that = this;
+                setTimeout(() => that.drawGrid(), 100);
+                this.$.scrollarea.addEventListener('scroll', pos => setTimeout(() => that.onScroll(), 1));
+            }
+
+            setContent(json) {
+                let pairs = JSON.parse(json);
+                let x = Math.floor(this.$.scrollarea.scrollLeft/this.width);
+                let y = Math.floor(this.$.scrollarea.scrollTop/this.height);
+
+                pairs.forEach(pair => {
+                    let row = this.$.container.childNodes.item(pair.y-y);
+                if (row != null) {
+                    let cell = row.childNodes.item(pair.x-x);
+                    if (cell != null) {
+
+                        let c = this.$.storage.querySelector("#id"+pair.x+"_"+pair.y);
+                        if (c != null) {
+                            cell.childNodes.forEach(child => cell.removeChild(child));
+                            cell.appendChild(c);
+                        } else {
+                            console.warn("cannot find "+pair.x+"_"+pair.y);
+                        }
+                    }
+                }
+            });
+            }
+
+            drawGrid() {
+                this.width = 100;
+                this.height = 100;
+
+                let ask = [];
+                this.maxY = Math.ceil(this.$.scrollarea.offsetHeight/this.height)+this.bufferY;
+                this.maxX = Math.ceil(this.$.scrollarea.offsetWidth/this.width)+this.bufferX;
+                for (var y=0; y < this.maxY; y++) {
+                    let row = document.createElement("div");
+                    row.classList.add("row")
+                    row.style.top = (y*this.height)+"px";
+                    this.$.container.appendChild(row);
+
+                    for (var x=0; x < this.maxX; x++) {
+                        let span = document.createElement('span');
+                        ask.push(x+":"+y);
+                        span.classList.add('cell');
+                        row.appendChild(span);
+                        span.style.left = (x*this.width)+"px";
+                    }
+                }
+                this.$server.getContent(ask);
+            }
+
+            onScroll() {
+                let currX = Math.floor(this.$.scrollarea.scrollLeft/this.width);
+                let currY = Math.floor(this.$.scrollarea.scrollTop/this.height);
+                let changeY = currY - this.prePosY;
+                let changeX = currX - this.prePosX;
+                var ask = [];
+                console.warn("change "+changeY);
+
+                for (var i = 0; i < Math.abs(changeY)/2 && Math.abs(changeY) >= Math.floor(this.bufferY/2); i++) {
+                    this.prePosY = currY;
+                    if (changeY > 0) {
+                        console.warn("cycle DOWN");
+                        let first = this.$.container.firstChild;
+                        let last = this.$.container.lastChild;
+                        this.$.container.removeChild(first);
+                        this.$.container.appendChild(first);
+                        let y = Math.floor((last.offsetTop + this.height)/this.height);
+                        console.warn("new y "+y);
+                        first.style.top = (y*this.height) + "px";
+                        first.childNodes.forEach(col => {
+                            ask.push(Math.floor(col.offsetLeft/this.width)+":"+ y);
+                    });
+                    } else {
+                        console.warn("cycle UP");
+                        let last = this.$.container.lastChild;
+                        let first = this.$.container.firstChild;
+                        this.$.container.removeChild(last);
+                        this.$.container.insertBefore(last, first);
+                        let y = Math.floor((first.offsetTop - first.offsetHeight)/this.height);
+                        last.style.top = (y*this.height) + "px";
+                        last.childNodes.forEach(col => {
+                            ask.push(Math.floor(col.offsetLeft/this.width)+":"+y);
+                    });
+                    }
+                }
+
+                for (var i = 0; i < Math.abs(changeX); i++) {
+                    if (changeX > 0) {
+                        let x = this.prePosX + this.maxX;
+                        this.$.container.childNodes.forEach(row => {
+                            let first = row.firstChild;
+                        let last = row.lastChild;
+                        row.removeChild(first);
+                        row.appendChild(first);
+                        first.style.left = (x*this.width) + "px";
+                        ask.push(x+":"+Math.floor(row.offsetTop/this.height));
+                    });
+                        this.prePosX++;
+
+                    } else {
+                        let x = this.prePosX-1;
+                        this.$.container.childNodes.forEach(row => {
+                            let first = row.firstChild;
+                        let last = row.lastChild;
+                        row.removeChild(last);
+                        row.insertBefore(last, first);
+                        last.style.left = (x*this.width) + "px";
+                        ask.push(x+":"+Math.floor(row.offsetTop/this.height));
+                    });
+
+                        this.prePosX--;
+                    }
+                }
+
+                if (ask.length > 0) {
+                    // console.warn("asking "+ask);
+                    this.$server.getContent(ask);
+                }
+            }
+        }
+        customElements.define(InfiniteGrid.is, InfiniteGrid);
+    </script>
+</dom-module>
