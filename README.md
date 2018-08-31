@@ -1,6 +1,6 @@
-# Game Card
+# Infinite Grid
 
-Vaadin 10 Java integration of https://github.com/vpusher/game-card
+Vaadin 10 Java and polymer template for having infinitely scrollable grid. 
 
 ## Development instructions
 

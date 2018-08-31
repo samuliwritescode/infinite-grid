@@ -129,7 +129,7 @@
                 var ask = [];
                 console.warn("change "+changeY);
 
-                for (var i = 0; i < Math.abs(changeY)/2 && Math.abs(changeY) >= Math.floor(this.bufferY/2); i++) {
+                for (var i = 0; i < Math.abs(changeY) && Math.abs(changeY) >= Math.floor(this.bufferY/2); i++) {
                     this.prePosY = currY;
                     if (changeY > 0) {
                         console.warn("cycle DOWN");
@@ -142,18 +142,18 @@
                         first.style.top = (y*this.height) + "px";
                         first.childNodes.forEach(col => {
                             ask.push(Math.floor(col.offsetLeft/this.width)+":"+ y);
-                    });
+                        });
                     } else {
                         console.warn("cycle UP");
                         let last = this.$.container.lastChild;
                         let first = this.$.container.firstChild;
                         this.$.container.removeChild(last);
                         this.$.container.insertBefore(last, first);
-                        let y = Math.floor((first.offsetTop - first.offsetHeight)/this.height);
+                        let y = Math.floor((first.offsetTop - this.height)/this.height);
                         last.style.top = (y*this.height) + "px";
                         last.childNodes.forEach(col => {
                             ask.push(Math.floor(col.offsetLeft/this.width)+":"+y);
-                    });
+                        });
                     }
                 }
 
