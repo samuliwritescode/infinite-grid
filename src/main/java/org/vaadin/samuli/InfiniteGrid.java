@@ -85,7 +85,6 @@ public class InfiniteGrid extends PolymerTemplate<InfiniteGrid.ExampleModel> {
     @ClientCallable
     public void getContent(String[] stuff) {
         maxSize = Math.max(stuff.length, maxSize);
-        System.out.println("max size "+maxSize);
         if (storage.getElement().getChildCount() > maxSize) {
             for(int i=0; i < maxSize;i++) {
 //                storage.getElement().removeChild(0);

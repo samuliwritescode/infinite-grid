@@ -64,7 +64,7 @@
 
             ready() {
                 super.ready();
-                this.bufferX = 10;
+                this.bufferX = 5;
                 this.bufferY = 10;
                 this.prePosX = 0;
                 this.prePosY = 0;
@@ -80,7 +80,7 @@
                 let y = Math.floor(this.$.scrollarea.scrollTop/this.height);
 
                 pairs.forEach(pair => {
-                    let row = this.$.container.childNodes.item(pair.y-y);
+                    let row = this.$.container.childNodes.item(pair.y-y+this.bufferY/2);
                 if (row != null) {
                     let cell = row.childNodes.item(pair.x-x);
                     if (cell != null) {
@@ -107,7 +107,7 @@
                 for (var y=0; y < this.maxY; y++) {
                     let row = document.createElement("div");
                     row.classList.add("row")
-                    row.style.top = (y*this.height)+"px";
+                    row.style.top = ((y-this.bufferY/2)*this.height)+"px";
                     this.$.container.appendChild(row);
 
                     for (var x=0; x < this.maxX; x++) {
@@ -127,24 +127,20 @@
                 let changeY = currY - this.prePosY;
                 let changeX = currX - this.prePosX;
                 var ask = [];
-                console.warn("change "+changeY);
 
                 for (var i = 0; i < Math.abs(changeY) && Math.abs(changeY) >= Math.floor(this.bufferY/2); i++) {
                     this.prePosY = currY;
                     if (changeY > 0) {
-                        console.warn("cycle DOWN");
                         let first = this.$.container.firstChild;
                         let last = this.$.container.lastChild;
                         this.$.container.removeChild(first);
                         this.$.container.appendChild(first);
                         let y = Math.floor((last.offsetTop + this.height)/this.height);
-                        console.warn("new y "+y);
                         first.style.top = (y*this.height) + "px";
                         first.childNodes.forEach(col => {
                             ask.push(Math.floor(col.offsetLeft/this.width)+":"+ y);
                         });
                     } else {
-                        console.warn("cycle UP");
                         let last = this.$.container.lastChild;
                         let first = this.$.container.firstChild;
                         this.$.container.removeChild(last);
