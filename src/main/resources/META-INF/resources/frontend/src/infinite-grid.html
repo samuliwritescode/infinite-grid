@@ -81,20 +81,25 @@
 
                 pairs.forEach(pair => {
                     let row = this.$.container.childNodes.item(pair.y-y+this.bufferY/2);
-                if (row != null) {
-                    let cell = row.childNodes.item(pair.x-x);
-                    if (cell != null) {
-
-                        let c = this.$.storage.querySelector("#id"+pair.x+"_"+pair.y);
-                        if (c != null) {
-                            cell.childNodes.forEach(child => cell.removeChild(child));
-                            cell.appendChild(c);
-                        } else {
-                            console.warn("cannot find "+pair.x+"_"+pair.y);
+                    setTimeout(() => {
+                        if (row != null) {
+                            let cell = row.childNodes.item(pair.x-x);
+                            if (cell != null) {
+                                if (pair.m != null) {
+                                    cell.innerText = pair.m;
+                                } else {
+                                    let c = this.$.storage.querySelector("#id"+pair.x+"_"+pair.y);
+                                    if (c != null) {
+                                        cell.childNodes.forEach(child => cell.removeChild(child));
+                                        cell.appendChild(c);
+                                    } else {
+                                        console.warn("cannot find "+pair.x+"_"+pair.y);
+                                    }
+                                }
+                            }
                         }
-                    }
-                }
-            });
+                    }, 1);
+                });
             }
 
             drawGrid() {
@@ -183,7 +188,8 @@
 
                 if (ask.length > 0) {
                     // console.warn("asking "+ask);
-                    this.$server.getContent(ask);
+                    let that = this;
+                    setTimeout(() => {that.$server.getContent(ask);}, 1);
                 }
             }
         }
