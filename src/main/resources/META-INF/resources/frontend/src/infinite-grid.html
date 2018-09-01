@@ -86,7 +86,7 @@
                             let cell = row.childNodes.item(pair.x-x);
                             if (cell != null) {
                                 if (pair.m != null) {
-                                    cell.innerText = pair.m;
+                                    cell.innerHTML = pair.m;
                                 } else {
                                     let c = this.$.storage.querySelector("#id"+pair.x+"_"+pair.y);
                                     if (c != null) {
