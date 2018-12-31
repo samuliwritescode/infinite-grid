@@ -70,7 +70,7 @@
                 this.prePosY = 0;
 
                 var that = this;
-                setTimeout(() => that.drawGrid(), 100);
+                setTimeout(() => that.drawGrid(0, 0), 100);
                 this.$.scrollarea.addEventListener('scroll', pos => setTimeout(() => that.onScroll(), 1));
             }
 
@@ -80,29 +80,27 @@
                 let y = Math.floor(this.$.scrollarea.scrollTop/this.height);
 
                 pairs.forEach(pair => {
-                    let row = this.$.container.childNodes.item(pair.y-y+this.bufferY/2);
                     setTimeout(() => {
-                        if (row != null) {
-                            let cell = row.childNodes.item(pair.x-x);
-                            if (cell != null) {
-                                if (pair.m != null) {
-                                    cell.innerHTML = pair.m;
+                        let cell = this.$.container.querySelector("#cid"+pair.x+"_"+pair.y);
+                        if (cell != null) {
+                            if (pair.m != null) {
+                                cell.innerHTML = pair.m;
+                            } else {
+                                let c = this.$.storage.querySelector("#id"+pair.x+"_"+pair.y);
+                                if (c != null) {
+                                    cell.appendChild(c);
                                 } else {
-                                    let c = this.$.storage.querySelector("#id"+pair.x+"_"+pair.y);
-                                    if (c != null) {
-                                        cell.childNodes.forEach(child => cell.removeChild(child));
-                                        cell.appendChild(c);
-                                    } else {
-                                        console.warn("cannot find "+pair.x+"_"+pair.y);
-                                    }
+                                    console.warn("cannot find "+pair.x+"_"+pair.y);
                                 }
                             }
+                        } else {
+                            console.warn("no cid"+pair.x+"_"+pair.y)
                         }
                     }, 1);
                 });
             }
 
-            drawGrid() {
+            drawGrid(initialX, initialY) {
                 this.width = 100;
                 this.height = 100;
 
@@ -117,7 +115,9 @@
 
                     for (var x=0; x < this.maxX; x++) {
                         let span = document.createElement('span');
-                        ask.push(x+":"+y);
+                        let coord = x+"_"+(y-this.bufferY/2);
+                        span.id = "cid"+coord;
+                        ask.push(coord);
                         span.classList.add('cell');
                         row.appendChild(span);
                         span.style.left = (x*this.width)+"px";
@@ -143,7 +143,10 @@
                         let y = Math.floor((last.offsetTop + this.height)/this.height);
                         first.style.top = (y*this.height) + "px";
                         first.childNodes.forEach(col => {
-                            ask.push(Math.floor(col.offsetLeft/this.width)+":"+ y);
+                            col.childNodes.forEach(child => col.removeChild(child));
+                            let coord = Math.floor(col.offsetLeft/this.width)+"_"+ y;
+                            col.id = "cid"+coord;
+                            ask.push(coord);
                         });
                     } else {
                         let last = this.$.container.lastChild;
@@ -153,7 +156,10 @@
                         let y = Math.floor((first.offsetTop - this.height)/this.height);
                         last.style.top = (y*this.height) + "px";
                         last.childNodes.forEach(col => {
-                            ask.push(Math.floor(col.offsetLeft/this.width)+":"+y);
+                            let coord = Math.floor(col.offsetLeft/this.width)+"_"+y;
+                            col.id = "cid"+coord;
+                            col.childNodes.forEach(child => col.removeChild(child));
+                            ask.push(coord);
                         });
                     }
                 }
@@ -163,24 +169,30 @@
                         let x = this.prePosX + this.maxX;
                         this.$.container.childNodes.forEach(row => {
                             let first = row.firstChild;
-                        let last = row.lastChild;
-                        row.removeChild(first);
-                        row.appendChild(first);
-                        first.style.left = (x*this.width) + "px";
-                        ask.push(x+":"+Math.floor(row.offsetTop/this.height));
-                    });
+                            let last = row.lastChild;
+                            row.removeChild(first);
+                            row.appendChild(first);
+                            first.style.left = (x*this.width) + "px";
+                            let coord = x+"_"+Math.floor(row.offsetTop/this.height);
+                            first.id = "cid"+coord;
+                            first.childNodes.forEach(child => first.removeChild(child));
+                            ask.push(coord);
+                        });
                         this.prePosX++;
 
                     } else {
                         let x = this.prePosX-1;
                         this.$.container.childNodes.forEach(row => {
                             let first = row.firstChild;
-                        let last = row.lastChild;
-                        row.removeChild(last);
-                        row.insertBefore(last, first);
-                        last.style.left = (x*this.width) + "px";
-                        ask.push(x+":"+Math.floor(row.offsetTop/this.height));
-                    });
+                            let last = row.lastChild;
+                            row.removeChild(last);
+                            row.insertBefore(last, first);
+                            last.style.left = (x*this.width) + "px";
+                            let coord = x+"_"+Math.floor(row.offsetTop/this.height);
+                            last.id = "cid"+coord;
+                            last.childNodes.forEach(child => last.removeChild(child));
+                            ask.push(coord);
+                        });
 
                         this.prePosX--;
                     }

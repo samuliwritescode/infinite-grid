@@ -92,7 +92,7 @@ public class InfiniteGrid extends PolymerTemplate<InfiniteGrid.ExampleModel> {
         }
 //        storage.removeAll();
         List<Pair> retvalue = Arrays.stream(stuff).map(str -> {
-            String[] pair = str.split(":");
+            String[] pair = str.split("_");
             Pair p = new Pair(Integer.valueOf(pair[0]), Integer.valueOf(pair[1]));
             p.setM(String.format("(%d, %d)", p.getX(), p.getY()));
             Component c = ((p.getX()+p.getY())%2) == 0 ?new Button(p.getM(), l-> System.out.println("got "+p.getM())):new Label(p.getM());
