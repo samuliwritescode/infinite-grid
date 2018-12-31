@@ -66,8 +66,7 @@
                 super.ready();
                 this.bufferX = 5;
                 this.bufferY = 10;
-                this.prePosX = 0;
-                this.prePosY = 0;
+
 
                 var that = this;
                 setTimeout(() => that.drawGrid(0, 0), 100);
@@ -100,17 +99,19 @@
             drawGrid(initialX, initialY) {
                 this.width = 100;
                 this.height = 100;
+                this.prePosX = initialX;
+                this.prePosY = initialY;
 
                 let ask = [];
                 this.maxY = Math.ceil(this.$.scrollarea.offsetHeight/this.height)+this.bufferY;
                 this.maxX = Math.ceil(this.$.scrollarea.offsetWidth/this.width)+this.bufferX;
-                for (var y=0; y < this.maxY; y++) {
+                for (var y = initialY; y < this.maxY+initialY; y++) {
                     let row = document.createElement("div");
                     row.classList.add("row")
                     row.style.top = ((y-this.bufferY/2)*this.height)+"px";
                     this.$.container.appendChild(row);
 
-                    for (var x=0; x < this.maxX; x++) {
+                    for (var x = initialX; x < this.maxX+initialX; x++) {
                         let span = document.createElement('span');
                         let coord = x+"_"+(y-this.bufferY/2);
                         span.id = "cid"+coord;
@@ -129,12 +130,22 @@
                 ask.push(coord);
             }
 
+            isRedrawingMoreEfficient(changeX, changeY) {
+                return Math.abs(changeY) > (Math.ceil(this.$.scrollarea.offsetHeight/this.height)+this.bufferY)/2 ||
+                Math.abs(changeX) > (Math.ceil(this.$.scrollarea.offsetWidth/this.width)+this.bufferX)/2;
+            }
+
             onScroll() {
                 let currX = Math.floor(this.$.scrollarea.scrollLeft/this.width);
                 let currY = Math.floor(this.$.scrollarea.scrollTop/this.height);
                 let changeY = currY - this.prePosY;
                 let changeX = currX - this.prePosX;
                 var ask = [];
+
+                if (this.isRedrawingMoreEfficient(changeX, changeY) == true) {
+                    this.drawGrid(currX, currY);
+                    return;
+                }
 
                 for (var i = 0; i < Math.abs(changeY) && Math.abs(changeY) >= Math.floor(this.bufferY/2); i++) {
                     this.prePosY = currY;
