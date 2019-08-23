@@ -1,7 +1,9 @@
 package org.vaadin.samuli;
 
+import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.html.Div;
+import com.vaadin.flow.component.html.Label;
 import com.vaadin.flow.data.provider.ListDataProvider;
 import com.vaadin.flow.data.renderer.TemplateRenderer;
 import com.vaadin.flow.router.Route;
@@ -17,12 +19,17 @@ public class DemoView extends Div {
     infiniteGrid.setHeight("50%");
     infiniteGrid.setCellSize(200, 40);
     infiniteGrid.setItemCount(100000, 100000);
+//    infiniteGrid.setTextGenerator((x,y) -> String.format("(%d, %d)", x, y));
+    infiniteGrid.setComponentGenerator((x,y) -> new Button(String.format("(%d, %d)", x, y)));
     add(infiniteGrid);
+
     Grid<Object> grid = new Grid<>();
-    grid.setDataProvider(new ListDataProvider<Object>(IntStream.range(0, 100000).mapToObj(i -> i).collect(Collectors.toList())));
+    grid.setDataProvider(new ListDataProvider<>(IntStream.range(0, 100000).mapToObj(i -> i).collect(Collectors.toList())));
     grid.setWidth("100%");
     grid.setHeight("50%");
-    for (int loop=0; loop < 9; loop++) grid.addColumn(TemplateRenderer.of(""+(loop+1)));
+    for (int loop=0; loop < 9; loop++)
+      grid.addComponentColumn(o ->new Button(o.toString()));
+//      grid.addColumn(TemplateRenderer.of(""+(loop+1)));
     add(grid);
     setSizeFull();
   }
