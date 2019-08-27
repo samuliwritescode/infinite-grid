@@ -6,14 +6,12 @@ import com.vaadin.flow.component.ClientCallable;
 import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.HasSize;
 import com.vaadin.flow.component.Tag;
-import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.dependency.HtmlImport;
 import com.vaadin.flow.component.html.Div;
 import com.vaadin.flow.component.polymertemplate.Id;
 import com.vaadin.flow.component.polymertemplate.PolymerTemplate;
 import com.vaadin.flow.data.renderer.Renderer;
 import com.vaadin.flow.data.renderer.TextRenderer;
-import com.vaadin.flow.dom.Element;
 import com.vaadin.flow.templatemodel.TemplateModel;
 import java.io.Serializable;
 import java.util.Arrays;
@@ -32,11 +30,9 @@ public class InfiniteGrid extends PolymerTemplate<InfiniteGrid.ExampleModel> imp
   private BiFunction<Integer, Integer, String> textGenerator = (x,y) -> null;
   private BiFunction<Integer, Integer, Component> componentGenerator = (x,y) -> null;
 
-  private Renderer<Pair> renderer = new TextRenderer<>(pair -> String.format("(%d, %d)", pair.getX(), pair.getY()));
+  private Renderer<CellData> renderer = new TextRenderer<>(pair -> String.format("(%d, %d)", pair.getX(), pair.getY()));
 
   public InfiniteGrid() {
-    // Set the initial value to the "value" property.
-
   }
 
   public void setTextGenerator(BiFunction<Integer, Integer, String> textGenerator) {
@@ -61,9 +57,9 @@ public class InfiniteGrid extends PolymerTemplate<InfiniteGrid.ExampleModel> imp
       }
     }
 
-    List<Pair> retvalue = Arrays.stream(stuff).map(str -> {
+    List<CellData> retvalue = Arrays.stream(stuff).map(str -> {
       String[] pair = str.split("_");
-      Pair p = new Pair(Integer.valueOf(pair[0]), Integer.valueOf(pair[1]));
+      CellData p = new CellData(Integer.valueOf(pair[0]), Integer.valueOf(pair[1]));
       Optional.ofNullable(textGenerator.apply(p.getX(), p.getY())).ifPresent(p::setM);
       Optional.ofNullable(componentGenerator.apply(p.getX(), p.getY())).ifPresent(component -> {
         component.setId("id" + p.getX() + "_" + p.getY());
@@ -89,25 +85,6 @@ public class InfiniteGrid extends PolymerTemplate<InfiniteGrid.ExampleModel> imp
     getModel().setItemY(y);
   }
 
-  @ClientCallable
-  public void handleClick() {
-    System.out.println("clicked");
-    final UI ui = UI.getCurrent();
-    new Thread(() -> {
-      try {
-        Thread.sleep(10000);
-      } catch (InterruptedException e) {
-        e.printStackTrace();
-      }
-      ui.access(() -> whenServerResponds());
-
-    }).start();
-  }
-
-  public void whenServerResponds() {
-    getElement().callFunction("whenServerResponds");
-  }
-
   /**
    * Template model which defines the single "value" property.
    */
@@ -125,15 +102,15 @@ public class InfiniteGrid extends PolymerTemplate<InfiniteGrid.ExampleModel> imp
   }
 
 
-  public static class Pair implements Serializable {
+  public static class CellData implements Serializable {
     private Integer x;
     private Integer y;
     private String m;
 
-    public Pair() {
+    public CellData() {
     }
 
-    public Pair(Integer x, Integer y) {
+    public CellData(Integer x, Integer y) {
       this.x = x;
       this.y = y;
     }

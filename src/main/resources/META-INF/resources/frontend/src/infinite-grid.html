@@ -3,7 +3,7 @@
 
 <dom-module id="infinite-grid">
     <template>
-        <style>
+        <style include="shared-styles">
             :host {
                 display: block;
                 padding: 0;
@@ -40,11 +40,6 @@
                 display: inline-block;
                 box-sizing: border-box;
                 position: absolute;
-                border-left-style: solid;
-                border-bottom-style: solid;
-                border-color: lightgray;
-                border-left-width: 1px;
-                border-bottom-width: 1px;
             }
         </style>
         <div id="scrollarea" class="scrollarea">
@@ -97,24 +92,30 @@
             }
 
             setContent(json) {
-                let pairs = JSON.parse(json);
-                pairs.forEach(pair => {
+                JSON.parse(json).forEach(celldata => {
                     setTimeout(() => {
-                        let cell = this.$.container.querySelector("#cid"+pair.x+"_"+pair.y);
+                        let cell = this.$.container.querySelector("#cid"+celldata.x+"_"+celldata.y);
                         if (cell != null) {
-                            if (pair.m != null) {
-                                cell.innerHTML = pair.m;
+                            if (celldata.m != null) {
+                                var dbind = document.createElement('dom-bind');
+                                var template = document.createElement('template');
+                                dbind.appendChild(template);
+                                template.innerHTML = celldata.m;
+                                this.clearChildren(cell);
+                                dbind.x = celldata.x;
+                                dbind.y = celldata.y;
+                                cell.appendChild(dbind);
                             } else {
-                                let c = this.$.storage.querySelector("#id"+pair.x+"_"+pair.y);
+                                let c = this.$.storage.querySelector("#id"+celldata.x+"_"+celldata.y);
                                 if (c != null) {
                                     this.clearChildren(cell);
                                     cell.appendChild(c);
                                 } else {
-                                    // console.warn("cannot find "+pair.x+"_"+pair.y);
+                                    console.debug("cannot find "+celldata.x+"_"+celldata.y);
                                 }
                             }
                         } else {
-                            // console.warn("no cid"+pair.x+"_"+pair.y)
+                            console.debug("no cid"+celldata.x+"_"+celldata.y)
                         }
                     }, 1);
                 });
@@ -237,7 +238,6 @@
                 }
 
                 if (ask.length > 0) {
-                    // console.warn("asking "+ask);
                     let that = this;
                     setTimeout(() => {that.$server.getContent(ask);}, 1);
                 }
