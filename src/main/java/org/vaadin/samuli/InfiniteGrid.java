@@ -28,7 +28,7 @@ public class InfiniteGrid extends PolymerTemplate<InfiniteGridModel> implements 
   private Div storage;
   private int maxSize = 0;
 
-  private BiFunction<Integer, Integer, String> textGenerator = (x,y) -> null;
+  private BiFunction<Integer, Integer, String> htmlGenerator = (x,y) -> null;
   private BiFunction<Integer, Integer, Component> componentGenerator = (x,y) -> null;
 
   private Renderer<CellData> renderer = new TextRenderer<>(pair -> String.format("(%d, %d)", pair.getX(), pair.getY()));
@@ -37,12 +37,12 @@ public class InfiniteGrid extends PolymerTemplate<InfiniteGridModel> implements 
   }
 
   /**
-   * Text generator to generate cell content with text/html.
+   * HTML generator to generate cell content with text/html.
    * x and y coordinates are provided as polymer data model like [[x]] and [[y]]
    * @param textGenerator
    */
-  public void setTextGenerator(BiFunction<Integer, Integer, String> textGenerator) {
-    this.textGenerator = textGenerator;
+  public void setHtmlGenerator(BiFunction<Integer, Integer, String> textGenerator) {
+    this.htmlGenerator = textGenerator;
   }
 
   /**
@@ -67,7 +67,7 @@ public class InfiniteGrid extends PolymerTemplate<InfiniteGridModel> implements 
     List<CellData> retvalue = Arrays.stream(stuff).map(str -> {
       String[] pair = str.split("_");
       CellData p = new CellData(Integer.valueOf(pair[0]), Integer.valueOf(pair[1]));
-      Optional.ofNullable(textGenerator.apply(p.getX(), p.getY())).ifPresent(p::setM);
+      Optional.ofNullable(htmlGenerator.apply(p.getX(), p.getY())).ifPresent(p::setM);
       Optional.ofNullable(componentGenerator.apply(p.getX(), p.getY())).ifPresent(component -> {
         component.setId("id" + p.getX() + "_" + p.getY());
         storage.add(component);
