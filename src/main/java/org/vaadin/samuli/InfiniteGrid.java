@@ -13,6 +13,7 @@ import com.vaadin.flow.component.polymertemplate.PolymerTemplate;
 import com.vaadin.flow.data.renderer.Renderer;
 import com.vaadin.flow.data.renderer.TextRenderer;
 import com.vaadin.flow.templatemodel.TemplateModel;
+import org.vaadin.samuli.InfiniteGrid.InfiniteGridModel;
 import java.io.Serializable;
 import java.util.Arrays;
 import java.util.List;
@@ -22,7 +23,7 @@ import java.util.stream.Collectors;
 
 @Tag("infinite-grid")
 @HtmlImport("src/infinite-grid.html")
-public class InfiniteGrid extends PolymerTemplate<InfiniteGrid.ExampleModel> implements HasSize {
+public class InfiniteGrid extends PolymerTemplate<InfiniteGridModel> implements HasSize {
   @Id("storage")
   private Div storage;
   private int maxSize = 0;
@@ -35,17 +36,23 @@ public class InfiniteGrid extends PolymerTemplate<InfiniteGrid.ExampleModel> imp
   public InfiniteGrid() {
   }
 
+  /**
+   * Text generator to generate cell content with text/html.
+   * x and y coordinates are provided as polymer data model like [[x]] and [[y]]
+   * @param textGenerator
+   */
   public void setTextGenerator(BiFunction<Integer, Integer, String> textGenerator) {
     this.textGenerator = textGenerator;
   }
 
+  /**
+   * Component generator to generate content with components.
+   * Please note that this comes with performance penalty. Use text generator if possible.
+   * @param componentGenerator
+   */
   public void setComponentGenerator(
       BiFunction<Integer, Integer, Component> componentGenerator) {
     this.componentGenerator = componentGenerator;
-  }
-
-  public void setValue(String value) {
-    getModel().setValue(value);
   }
 
   @ClientCallable
@@ -75,40 +82,41 @@ public class InfiniteGrid extends PolymerTemplate<InfiniteGrid.ExampleModel> imp
     }
   }
 
+  /**
+   * Set cell size in pixels. All cells will be with same size.
+   * @param width
+   * @param height
+   */
   public void setCellSize(int width, int height) {
     getModel().setCellWidth(width);
     getModel().setCellHeight(height);
   }
 
+  /**
+   * Set the maximum number of cells.
+   * @param x number of horizontal cells.
+   * @param y number of vertical cells.
+   */
   public void setItemCount(int x, int y) {
-    getModel().setItemX(x);
-    getModel().setItemY(y);
+    getModel().setCellCountX(x);
+    getModel().setCellCountY(y);
   }
 
   /**
    * Template model which defines the single "value" property.
    */
-  public interface ExampleModel extends TemplateModel {
-
-    void setValue(String name);
-
+  public interface InfiniteGridModel extends TemplateModel {
     void setCellWidth(Integer width);
-
     void setCellHeight(Integer height);
 
-    void setItemX(Integer x);
-
-    void setItemY(Integer y);
+    void setCellCountX(Integer x);
+    void setCellCountY(Integer y);
   }
 
-
-  public static class CellData implements Serializable {
+  private static class CellData implements Serializable {
     private Integer x;
     private Integer y;
     private String m;
-
-    public CellData() {
-    }
 
     public CellData(Integer x, Integer y) {
       this.x = x;
@@ -119,16 +127,8 @@ public class InfiniteGrid extends PolymerTemplate<InfiniteGrid.ExampleModel> imp
       return x;
     }
 
-    public void setX(Integer x) {
-      this.x = x;
-    }
-
     public Integer getY() {
       return y;
-    }
-
-    public void setY(Integer y) {
-      this.y = y;
     }
 
     public String getM() {
