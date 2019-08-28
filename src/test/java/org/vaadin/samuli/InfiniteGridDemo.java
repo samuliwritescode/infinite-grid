@@ -62,7 +62,7 @@ public class InfiniteGridDemo extends VerticalLayout {
     setMargin(false);
     setPadding(false);
     H3 title = new H3(
-        "Below there are 4 InfiniteGrids. 1. has html only content. 2. has html with data model. 3. has Vaadin components. 4. has colorful content as a show off."
+        "Below there are 4 InfiniteGrids. 1. has text only content. 2. has html with data model. 3. has Vaadin components. 4. has colorful html content as a show off."
     );
     add(
         title,
