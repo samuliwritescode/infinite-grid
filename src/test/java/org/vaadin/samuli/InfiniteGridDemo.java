@@ -15,8 +15,8 @@ public class InfiniteGridDemo extends VerticalLayout {
   public InfiniteGridDemo() {
     HorizontalLayout firstRow = new HorizontalLayout();
     HorizontalLayout secondRow = new HorizontalLayout();
-    firstRow.setSizeFull();
-    secondRow.setSizeFull();
+    firstRow.setWidth("100%");
+    secondRow.setWidth("100%");
     firstRow.setSpacing(false);
     secondRow.setSpacing(false);
     firstRow.setMargin(false);
@@ -29,7 +29,7 @@ public class InfiniteGridDemo extends VerticalLayout {
 
     InfiniteGrid htmlGrid = createInfiniteGrid();
     htmlGrid.setUseDomBind(true);
-    htmlGrid.setHtmlGenerator((x, y) -> "<button> [[x]], [[y]]</button>");
+    htmlGrid.setHtmlGenerator((x, y) -> "[[x]], [[y]]");
     firstRow.add(htmlGrid);
 
     InfiniteGrid componentGrid = createInfiniteGrid();
@@ -51,27 +51,32 @@ public class InfiniteGridDemo extends VerticalLayout {
               Math.abs((int)(Math.cos(y*0.3)*255))) +
           ";\"></div>";
     });
-    colorGrid.setWidth("50%");
-    colorGrid.setHeight("100%");
     secondRow.add(colorGrid);
+
+    firstRow.setFlexGrow(0.5, textGrid);
+    firstRow.setFlexGrow(0.5, htmlGrid);
+    secondRow.setFlexGrow(0.5, componentGrid);
+    secondRow.setFlexGrow(0.5, colorGrid);
     setSizeFull();
     setSpacing(true);
     setMargin(false);
     setPadding(false);
+    H3 title = new H3(
+        "Below there are 4 InfiniteGrids. 1. has html only content. 2. has html with data model. 3. has Vaadin components. 4. has colorful content as a show off."
+    );
     add(
-        new H3(
-            "Below there are 4 InfiniteGrids. 1. has html only content. 2. has html with data model. 3. has Vaadin components. 4. has colorful content as a show off."
-        ),
+        title,
         firstRow,
         secondRow
     );
+    setFlexGrow(0, title);
+    setFlexGrow(0.5, firstRow);
+    setFlexGrow(0.5, secondRow);
   }
 
   private InfiniteGrid createInfiniteGrid() {
     InfiniteGrid infiniteGrid = new InfiniteGrid();
     infiniteGrid.getElement().getClassList().add("borders");
-    infiniteGrid.setWidth("50%");
-    infiniteGrid.setHeight("100%");
     infiniteGrid.setCellSize(200, 40);
     infiniteGrid.setItemCount(100000, 100000);
     return infiniteGrid;
