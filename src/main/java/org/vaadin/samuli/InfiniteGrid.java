@@ -21,6 +21,12 @@ import java.util.stream.Collectors;
 
 @Tag("infinite-grid")
 @HtmlImport("src/infinite-grid.html")
+/**
+  * InfiniteGrid is a Grid like component that allows arbitrary amount of scrolling in both horizontal and vertical directions.
+  * Data for cells are fetched lazily on demand from server. InfiniteGrid is not extending or using Vaadin Grid
+  * and does not share features like resizable columns or row selection. It is aimed to provide a way to have arbitrary
+  * number of columns without a performance penalty. In practice the max scrollable area depends on browser limitations.
+ */
 public class InfiniteGrid extends PolymerTemplate<InfiniteGridModel> implements HasSize {
   private static final int DEFAULT_CELLWIDTH = 200;
   private static final int DEFAULT_CELLHEIGHT = 40;
@@ -123,7 +129,7 @@ public class InfiniteGrid extends PolymerTemplate<InfiniteGridModel> implements 
   }
 
   /**
-   * Template model which defines the single "value" property.
+   * Settings shared with client side.
    */
   public interface InfiniteGridModel extends TemplateModel {
     void setDimensions(Dimensions dimensions);

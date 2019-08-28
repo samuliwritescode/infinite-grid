@@ -8,10 +8,7 @@
     <version>0.1-SNAPSHOT</version>
     <name>InfiniteGrid</name>
     <description>
-      InfiniteGrid is a Grid like component that allows arbitrary amount of scrolling in both horizontal and vertical directions.
-      Data for cells are fetched lazily on demand from server. InfiniteGrid is not extending or using Vaadin Grid
-      and does not share features like resizable columns or row selection. It is aimed to provide a way to have arbitrary
-      number of columns without a performance penalty.
+      InfiniteGrid addon for Vaadin 10+
     </description>
 
     <properties>
