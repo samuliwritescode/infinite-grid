@@ -24,6 +24,9 @@ import java.util.stream.Collectors;
 @Tag("infinite-grid")
 @HtmlImport("src/infinite-grid.html")
 public class InfiniteGrid extends PolymerTemplate<InfiniteGridModel> implements HasSize {
+  private static final int DEFAULT_CELLWIDTH = 200;
+  private static final int DEFAULT_CELLHEIGHT = 40;
+
   @Id("storage")
   private Div storage;
   private int maxSize = 0;
@@ -34,11 +37,14 @@ public class InfiniteGrid extends PolymerTemplate<InfiniteGridModel> implements 
   private Renderer<CellData> renderer = new TextRenderer<>(pair -> String.format("(%d, %d)", pair.getX(), pair.getY()));
 
   public InfiniteGrid() {
+    setCellSize(DEFAULT_CELLWIDTH, DEFAULT_CELLHEIGHT);
+    setUseDomBind(false);
   }
 
   /**
    * HTML generator to generate cell content with text/html.
-   * x and y coordinates are provided as polymer data model like [[x]] and [[y]]
+   * When setUseDomBind is set to true x and y coordinates
+   * are provided as polymer data model like [[x]] and [[y]]
    * @param textGenerator
    */
   public void setHtmlGenerator(BiFunction<Integer, Integer, String> textGenerator) {
@@ -88,8 +94,8 @@ public class InfiniteGrid extends PolymerTemplate<InfiniteGridModel> implements 
    * @param height
    */
   public void setCellSize(int width, int height) {
-    getModel().setCellWidth(width);
-    getModel().setCellHeight(height);
+    getModel().getDimensions().setCellWidth(width);
+    getModel().getDimensions().setCellHeight(height);
   }
 
   /**
@@ -98,19 +104,66 @@ public class InfiniteGrid extends PolymerTemplate<InfiniteGridModel> implements 
    * @param y number of vertical cells.
    */
   public void setItemCount(int x, int y) {
-    getModel().setCellCountX(x);
-    getModel().setCellCountY(y);
+    getModel().getDimensions().setCellCountX(x);
+    getModel().getDimensions().setCellCountY(y);
+  }
+
+  /**
+   * Whether or not html generator supports polymer data model or not.
+   * By default it does not. Having this off is a small optimization.
+   * @param use
+   */
+  public void setUseDomBind(boolean use) {
+    getModel().setUseDomBind(use);
   }
 
   /**
    * Template model which defines the single "value" property.
    */
   public interface InfiniteGridModel extends TemplateModel {
-    void setCellWidth(Integer width);
-    void setCellHeight(Integer height);
+    void setDimensions(Dimensions dimensions);
+    Dimensions getDimensions();
 
-    void setCellCountX(Integer x);
-    void setCellCountY(Integer y);
+    void setUseDomBind(Boolean use);
+  }
+
+  public static class Dimensions {
+    private Integer cellWidth;
+    private Integer cellHeight;
+    private Integer cellCountX;
+    private Integer cellCountY;
+
+    public Integer getCellWidth() {
+      return cellWidth;
+    }
+
+    public void setCellWidth(Integer cellWidth) {
+      this.cellWidth = cellWidth;
+    }
+
+    public Integer getCellHeight() {
+      return cellHeight;
+    }
+
+    public void setCellHeight(Integer cellHeight) {
+      this.cellHeight = cellHeight;
+    }
+
+    public Integer getCellCountX() {
+      return cellCountX;
+    }
+
+    public void setCellCountX(Integer cellCountX) {
+      this.cellCountX = cellCountX;
+    }
+
+    public Integer getCellCountY() {
+      return cellCountY;
+    }
+
+    public void setCellCountY(Integer cellCountY) {
+      this.cellCountY = cellCountY;
+    }
   }
 
   private static class CellData implements Serializable {

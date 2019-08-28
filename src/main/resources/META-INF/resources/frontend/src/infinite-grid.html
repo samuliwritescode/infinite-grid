@@ -5,7 +5,7 @@
     <template>
         <style include="shared-styles">
             :host {
-                display: block;
+                display: inline-block;
                 padding: 0;
                 margin: 0;
             }
@@ -57,8 +57,8 @@
 
             ready() {
                 super.ready();
-                this.bufferX = 5;
-                this.bufferY = 10;
+                this.bufferX = 6;
+                this.bufferY = 14;
                 var that = this;
 
                 this.$.scrollarea.addEventListener('scroll', pos => setTimeout(() => that.onScroll(), 1));
@@ -66,45 +66,39 @@
 
             static get properties() {
                 return {
-                    cellWidth: {type: Number, observer: 'widthChanged'},
-                    cellHeight: {type: Number, observer: 'heightChanged'},
-                    cellCountX: {type: Number, observer: 'containerWidthChanged'},
-                    cellCountY: {type: Number, observer: 'containerHeightChanged'}
+                    dimensions: {type: Object, observer: 'dimensionsChanged'}
                 }
             }
 
-            widthChanged(width) {
+            dimensionsChanged(dimensions) {
                 var that = this;
+                this.cellWidth = dimensions.cellWidth;
+                this.cellHeight = dimensions.cellHeight;
+
+                this.$.container.style.width = dimensions.cellCountX*this.cellWidth+"px";
+                this.$.container.style.height = dimensions.cellCountY*this.cellHeight+"px";
                 setTimeout(() => that.drawGrid(0, 0), 100);
-            }
-
-            heightChanged(height) {
-                var that = this;
-                setTimeout(() => that.drawGrid(0, 0), 100);
-            }
-
-            containerWidthChanged(width) {
-                this.$.container.style.width = width*this.cellWidth+"px";
-            }
-
-            containerHeightChanged(height) {
-                this.$.container.style.height = height*this.cellHeight+"px";
             }
 
             setContent(json) {
+                let that = this;
                 JSON.parse(json).forEach(celldata => {
                     setTimeout(() => {
                         let cell = this.$.container.querySelector("#cid"+celldata.x+"_"+celldata.y);
                         if (cell != null) {
                             if (celldata.m != null) {
-                                var dbind = document.createElement('dom-bind');
-                                var template = document.createElement('template');
-                                dbind.appendChild(template);
-                                template.innerHTML = celldata.m;
-                                this.clearChildren(cell);
-                                dbind.x = celldata.x;
-                                dbind.y = celldata.y;
-                                cell.appendChild(dbind);
+                                if (this.useDomBind == true) {
+                                    var dbind = document.createElement('dom-bind');
+                                    var template = document.createElement('template');
+                                    dbind.appendChild(template);
+                                    template.innerHTML = celldata.m;
+                                    this.clearChildren(cell);
+                                    dbind.x = celldata.x;
+                                    dbind.y = celldata.y;
+                                    cell.appendChild(dbind);
+                                } else {
+                                    cell.innerHTML = celldata.m;
+                                }
                             } else {
                                 let c = this.$.storage.querySelector("#id"+celldata.x+"_"+celldata.y);
                                 if (c != null) {
