@@ -2,7 +2,7 @@ package org.vaadin.samuli;
 
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.dependency.HtmlImport;
-import com.vaadin.flow.component.html.Label;
+import com.vaadin.flow.component.html.H3;
 import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
@@ -23,6 +23,7 @@ public class InfiniteGridDemo extends VerticalLayout {
     secondRow.setMargin(false);
 
     InfiniteGrid textGrid = createInfiniteGrid();
+    textGrid.setTextOnly(true);
     textGrid.setHtmlGenerator((x,y)-> String.format("%d, %d", x,y));
     firstRow.add(textGrid);
 
@@ -58,7 +59,7 @@ public class InfiniteGridDemo extends VerticalLayout {
     setMargin(false);
     setPadding(false);
     add(
-        new Label(
+        new H3(
             "Below there are 4 InfiniteGrids. 1. has html only content. 2. has html with data model. 3. has Vaadin components. 4. has colorful content as a show off."
         ),
         firstRow,

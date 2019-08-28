@@ -10,8 +10,6 @@ import com.vaadin.flow.component.dependency.HtmlImport;
 import com.vaadin.flow.component.html.Div;
 import com.vaadin.flow.component.polymertemplate.Id;
 import com.vaadin.flow.component.polymertemplate.PolymerTemplate;
-import com.vaadin.flow.data.renderer.Renderer;
-import com.vaadin.flow.data.renderer.TextRenderer;
 import com.vaadin.flow.templatemodel.TemplateModel;
 import org.vaadin.samuli.InfiniteGrid.InfiniteGridModel;
 import java.io.Serializable;
@@ -34,11 +32,10 @@ public class InfiniteGrid extends PolymerTemplate<InfiniteGridModel> implements 
   private BiFunction<Integer, Integer, String> htmlGenerator = (x,y) -> null;
   private BiFunction<Integer, Integer, Component> componentGenerator = (x,y) -> null;
 
-  private Renderer<CellData> renderer = new TextRenderer<>(pair -> String.format("(%d, %d)", pair.getX(), pair.getY()));
-
   public InfiniteGrid() {
     setCellSize(DEFAULT_CELLWIDTH, DEFAULT_CELLHEIGHT);
     setUseDomBind(false);
+    setTextOnly(false);
   }
 
   /**
@@ -118,6 +115,14 @@ public class InfiniteGrid extends PolymerTemplate<InfiniteGridModel> implements 
   }
 
   /**
+   * Optimization to turn off html support and generate text only content.
+   * @param textOnly
+   */
+  public void setTextOnly(boolean textOnly) {
+    getModel().setTextOnly(textOnly);
+  }
+
+  /**
    * Template model which defines the single "value" property.
    */
   public interface InfiniteGridModel extends TemplateModel {
@@ -125,6 +130,7 @@ public class InfiniteGrid extends PolymerTemplate<InfiniteGridModel> implements 
     Dimensions getDimensions();
 
     void setUseDomBind(Boolean use);
+    void setTextOnly(Boolean textonly);
   }
 
   public static class Dimensions {
