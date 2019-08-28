@@ -2,31 +2,42 @@ package org.vaadin.samuli;
 
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.dependency.HtmlImport;
-import com.vaadin.flow.component.html.Div;
+import com.vaadin.flow.component.html.Label;
 import com.vaadin.flow.component.notification.Notification;
+import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
+import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.router.Route;
 
 @Route("")
 @HtmlImport("src/shared-styles.html")
-public class InfiniteGridDemo extends Div {
+public class InfiniteGridDemo extends VerticalLayout {
 
   public InfiniteGridDemo() {
+    HorizontalLayout firstRow = new HorizontalLayout();
+    HorizontalLayout secondRow = new HorizontalLayout();
+    firstRow.setSizeFull();
+    secondRow.setSizeFull();
+    firstRow.setSpacing(false);
+    secondRow.setSpacing(false);
+    firstRow.setMargin(false);
+    secondRow.setMargin(false);
+
     InfiniteGrid textGrid = createInfiniteGrid();
     textGrid.setHtmlGenerator((x,y)-> String.format("%d, %d", x,y));
-    add(textGrid);
+    firstRow.add(textGrid);
 
     InfiniteGrid htmlGrid = createInfiniteGrid();
     htmlGrid.setUseDomBind(true);
     htmlGrid.setHtmlGenerator((x, y) -> "<button> [[x]], [[y]]</button>");
-    add(htmlGrid);
+    firstRow.add(htmlGrid);
 
     InfiniteGrid componentGrid = createInfiniteGrid();
     componentGrid.setComponentGenerator((x, y) ->
         new Button(
-            String.format("(%d, %d)", x, y),
+            String.format("%d, %d", x, y),
             e -> Notification.show(String.format("clicked (%d, %d)", x, y))
         ));
-    add(componentGrid);
+    secondRow.add(componentGrid);
 
     InfiniteGrid colorGrid = new InfiniteGrid();
     colorGrid.setCellSize(100,100);
@@ -40,20 +51,28 @@ public class InfiniteGridDemo extends Div {
           ";\"></div>";
     });
     colorGrid.setWidth("50%");
-    colorGrid.setHeight("45%");
-    add(colorGrid);
+    colorGrid.setHeight("100%");
+    secondRow.add(colorGrid);
     setSizeFull();
-
-    getElement().getStyle().set("overflow", "hidden");
+    setSpacing(true);
+    setMargin(false);
+    setPadding(false);
+    add(
+        new Label(
+            "Below there are 4 InfiniteGrids. 1. has html only content. 2. has html with data model. 3. has Vaadin components. 4. has colorful content as a show off."
+        ),
+        firstRow,
+        secondRow
+    );
   }
 
   private InfiniteGrid createInfiniteGrid() {
     InfiniteGrid infiniteGrid = new InfiniteGrid();
     infiniteGrid.getElement().getClassList().add("borders");
     infiniteGrid.setWidth("50%");
-    infiniteGrid.setHeight("45%");
+    infiniteGrid.setHeight("100%");
     infiniteGrid.setCellSize(200, 40);
-    infiniteGrid.setItemCount(100, 100);
+    infiniteGrid.setItemCount(100000, 100000);
     return infiniteGrid;
   }
 }
