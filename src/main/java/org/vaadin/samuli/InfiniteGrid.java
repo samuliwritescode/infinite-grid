@@ -6,7 +6,7 @@ import com.vaadin.flow.component.ClientCallable;
 import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.HasSize;
 import com.vaadin.flow.component.Tag;
-import com.vaadin.flow.component.dependency.HtmlImport;
+import com.vaadin.flow.component.dependency.JsModule;
 import com.vaadin.flow.component.html.Div;
 import com.vaadin.flow.component.polymertemplate.Id;
 import com.vaadin.flow.component.polymertemplate.PolymerTemplate;
@@ -20,7 +20,7 @@ import java.util.function.BiFunction;
 import java.util.stream.Collectors;
 
 @Tag("infinite-grid")
-@HtmlImport("src/infinite-grid.html")
+@JsModule("./src/infinite-grid.js")
 /**
   * InfiniteGrid is a Grid like component that allows arbitrary amount of scrolling in both horizontal and vertical directions.
   * Data for cells are fetched lazily on demand from server. InfiniteGrid is not extending or using Vaadin Grid
