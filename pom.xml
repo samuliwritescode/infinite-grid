@@ -5,10 +5,10 @@
 
     <groupId>org.vaadin.samuli</groupId>
     <artifactId>infinitegrid</artifactId>
-    <version>1.0-SNAPSHOT</version>
+    <version>0.2-SNAPSHOT</version>
     <name>InfiniteGrid</name>
     <description>
-      InfiniteGrid addon for Vaadin 14+
+      InfiniteGrid addon for Vaadin 10+
     </description>
 
     <properties>
@@ -78,10 +78,6 @@
             <artifactId>slf4j-simple</artifactId>
             <scope>test</scope>
         </dependency>
-        <!-- The following dependency is generated using webjars.org. If 
-             it does not resolve, go to https://www.webjars.org and deploy it as "Bower GitHub"
-             -->
-
     </dependencies>
 
     <build>
@@ -130,7 +126,6 @@
                             directly into src/test/webjar-debug and modify them for testing -->
                         <resourceBases>
                           <resourceBase>src/main/resources/META-INF/resources/</resourceBase>
-                          <resourceBase>src/test/resources/META-INF/resources/</resourceBase>
                         </resourceBases>
                     </webAppConfig>
                     <supportedPackagings>
