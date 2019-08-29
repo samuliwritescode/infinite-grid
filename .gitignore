@@ -1,4 +1,4 @@
-webpack.generated.js
+webpack.*
 node_modules/
 .idea/
 *.iml
