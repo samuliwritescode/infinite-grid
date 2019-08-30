@@ -90,9 +90,11 @@
                 <execution>
                   <goals>
                     <goal>prepare-frontend</goal>
+                    <goal>build-frontend</goal>
                   </goals>
                 </execution>
               </executions>
+
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
@@ -115,12 +117,23 @@
             <plugin>
                 <groupId>org.eclipse.jetty</groupId>
                 <artifactId>jetty-maven-plugin</artifactId>
-                <version>9.4.14.v20181114</version>
+                <version>9.4.15.v20190215</version>
                 <configuration>
                     <scanIntervalSeconds>-1</scanIntervalSeconds>
                     <!-- Use test scope because the UI/demo classes are in 
                         the test package. -->
                     <useTestScope>true</useTestScope>
+                    <systemProperties>
+                      <force>true</force>
+                      <systemProperty>
+                        <name>vaadin.compatibilityMode</name>
+                        <value>true</value>
+                      </systemProperty>
+                      <systemProperty>
+                        <name>vaadin.bowerMode</name>
+                        <value>true</value>
+                      </systemProperty>
+                    </systemProperties>
                     <webAppConfig>
                         <!-- This is only needed to be able to unzip webjars 
                             directly into src/test/webjar-debug and modify them for testing -->
@@ -141,6 +154,23 @@
             <id>directory</id>
             <build>
                 <plugins>
+                    <plugin>
+                      <groupId>com.vaadin</groupId>
+                      <artifactId>vaadin-maven-plugin</artifactId>
+                      <executions>
+                        <execution>
+                          <goals>
+                            <goal>migrate-to-p3</goal>
+                          </goals>
+                        </execution>
+                      </executions>
+                      <configuration>
+                        <resources>${project.basedir}/src/main/resources/META-INF/resources/frontend/</resources>
+                        <frontendDirectory>${project.basedir}/src/main/resources/META-INF/resources/frontend/</frontendDirectory>
+                        <keepOriginal>true</keepOriginal>
+                        <annotationsRewrite>SKIP</annotationsRewrite>
+                      </configuration>
+                    </plugin>
                     <plugin>
                         <groupId>org.apache.maven.plugins</groupId>
                         <artifactId>maven-assembly-plugin</artifactId>
