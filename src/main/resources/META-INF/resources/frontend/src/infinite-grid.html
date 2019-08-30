@@ -61,8 +61,6 @@
 
             ready() {
                 super.ready();
-                this.bufferX = 1;
-                this.bufferY = 14;
                 var that = this;
 
                 this.$.scrollarea.addEventListener('scroll', pos => setTimeout(() => that.onScroll(), 1));

@@ -32,6 +32,8 @@ import java.util.stream.Collectors;
 public class InfiniteGrid extends PolymerTemplate<InfiniteGridModel> implements HasSize {
   private static final int DEFAULT_CELLWIDTH = 200;
   private static final int DEFAULT_CELLHEIGHT = 40;
+  private static final int DEFAULT_BUFFER_X = 3;
+  private static final int DEFAULT_BUFFER_Y = 9;
 
   @Id("storage")
   private Div storage;
@@ -42,6 +44,7 @@ public class InfiniteGrid extends PolymerTemplate<InfiniteGridModel> implements 
 
   public InfiniteGrid() {
     setCellSize(DEFAULT_CELLWIDTH, DEFAULT_CELLHEIGHT);
+    setBufferSize(DEFAULT_BUFFER_X, DEFAULT_BUFFER_Y);
     setUseDomBind(false);
     setTextOnly(false);
   }
@@ -131,6 +134,18 @@ public class InfiniteGrid extends PolymerTemplate<InfiniteGridModel> implements 
   }
 
   /**
+   * Set the buffer of how many cells in the hidden will component create.
+   * Larger the buffer the smoother scrolling but with penalty of having
+   * more elements outside visible area.
+   * @param x
+   * @param y
+   */
+  public void setBufferSize(int x, int y) {
+    getModel().setBufferX(x);
+    getModel().setBufferY(y*2);
+  }
+
+  /**
    * Settings shared with client side.
    */
   public interface InfiniteGridModel extends TemplateModel {
@@ -139,6 +154,9 @@ public class InfiniteGrid extends PolymerTemplate<InfiniteGridModel> implements 
 
     void setUseDomBind(Boolean use);
     void setTextOnly(Boolean textonly);
+
+    void setBufferX(int bufferX);
+    void setBufferY(int bufferY);
   }
 
   public static class Dimensions {
