@@ -84,6 +84,14 @@
                 setTimeout(() => that.drawGrid(0, 0), 100);
             }
 
+            createTemplate(content) {
+                var dbind = document.createElement('dom-bind');
+                var template = document.createElement('template');
+                dbind.appendChild(template);
+                template.innerHTML = content;
+                return dbind;
+            }
+
             setContent(json) {
                 let that = this;
                 JSON.parse(json).forEach(celldata => {
@@ -92,14 +100,11 @@
                         if (cell != null) {
                             if (celldata.m != null) {
                                 if (this.useDomBind == true) {
-                                    var dbind = document.createElement('dom-bind');
-                                    var template = document.createElement('template');
-                                    dbind.appendChild(template);
-                                    template.innerHTML = celldata.m;
+                                    var template = this.createTemplate(celldata.m);
+                                    template.x = celldata.x;
+                                    template.y = celldata.y;
                                     this.clearChildren(cell);
-                                    dbind.x = celldata.x;
-                                    dbind.y = celldata.y;
-                                    cell.appendChild(dbind);
+                                    cell.appendChild(template);
                                 } else if(this.textOnly == true) {
                                     cell.innerText = celldata.m;
                                 } else {
@@ -146,9 +151,19 @@
                         span.style.height = this.cellHeight+"px";
                         row.appendChild(span);
                         span.style.left = (x*this.cellWidth)+"px";
+
+                        if(this.domTemplate != null) {
+                            var template = this.createTemplate(this.domTemplate);
+                            template.x = x;
+                            template.y = (y-this.bufferY/2);
+                            span.appendChild(template);
+                        }
                     }
                 }
-                this.$server.getContent(ask);
+
+                if (this.domTemplate == null) {
+                    this.$server.getContent(ask);
+                }
             }
 
             clearChildren(node) {
@@ -157,10 +172,17 @@
                 }
             }
 
-            prepareAskContent(coord, col, ask) {
-                col.id = "cid"+coord;
-                col.childNodes.forEach(child => col.removeChild(child));
-                ask.push(coord);
+            prepareAskContent(x, y, col, ask) {
+                col.id = "cid"+x+"_"+y;
+                if (this.domTemplate == null) {
+                    col.childNodes.forEach(child => col.removeChild(child));
+                    ask.push(x+"_"+y);
+                } else {
+                    col.childNodes.forEach(child => {
+                        child.x = x;
+                        child.y = y;
+                    });
+                }
             }
 
             isRedrawingMoreEfficient(changeX, changeY) {
@@ -190,8 +212,7 @@
                         let y = Math.floor((last.offsetTop + this.cellHeight)/this.cellHeight);
                         first.style.top = (y*this.cellHeight) + "px";
                         first.childNodes.forEach(col => {
-                            let coord = Math.floor(col.offsetLeft/this.cellWidth)+"_"+ y;
-                            this.prepareAskContent(coord, col, ask);
+                            this.prepareAskContent(Math.floor(col.offsetLeft/this.cellWidth), y, col, ask);
                         });
                     } else {
                         let last = this.$.container.lastChild;
@@ -201,8 +222,7 @@
                         let y = Math.floor((first.offsetTop - this.cellHeight)/this.cellHeight);
                         last.style.top = (y*this.cellHeight) + "px";
                         last.childNodes.forEach(col => {
-                            let coord = Math.floor(col.offsetLeft/this.cellWidth)+"_"+y;
-                            this.prepareAskContent(coord, col, ask);
+                            this.prepareAskContent(Math.floor(col.offsetLeft/this.cellWidth), y, col, ask);
                         });
                     }
                 }
@@ -216,8 +236,7 @@
                             row.removeChild(first);
                             row.appendChild(first);
                             first.style.left = (x*this.cellWidth) + "px";
-                            let coord = x+"_"+Math.floor(row.offsetTop/this.cellHeight);
-                            this.prepareAskContent(coord, first, ask);
+                            this.prepareAskContent(x, Math.floor(row.offsetTop/this.cellHeight), first, ask);
                         });
                         this.prePosX++;
 
@@ -229,8 +248,7 @@
                             row.removeChild(last);
                             row.insertBefore(last, first);
                             last.style.left = (x*this.cellWidth) + "px";
-                            let coord = x+"_"+Math.floor(row.offsetTop/this.cellHeight);
-                            this.prepareAskContent(coord, last, ask);
+                            this.prepareAskContent(x, Math.floor(row.offsetTop/this.cellHeight), last, ask);
                         });
 
                         this.prePosX--;

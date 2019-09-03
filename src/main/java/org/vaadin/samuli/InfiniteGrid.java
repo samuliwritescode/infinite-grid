@@ -60,6 +60,14 @@ public class InfiniteGrid extends PolymerTemplate<InfiniteGridModel> implements 
   }
 
   /**
+   * Static Polymer template to be used for all cells. x and y coordinates are provided.
+   * @param template
+   */
+  public void setTemplateGenerator(String template) {
+    getModel().setDomTemplate(template);
+  }
+
+  /**
    * Component generator to generate content with components.
    * Please note that this comes with performance penalty. Use text generator if possible.
    * @param componentGenerator
@@ -152,6 +160,7 @@ public class InfiniteGrid extends PolymerTemplate<InfiniteGridModel> implements 
     void setDimensions(Dimensions dimensions);
     Dimensions getDimensions();
 
+    void setDomTemplate(String template);
     void setUseDomBind(Boolean use);
     void setTextOnly(Boolean textonly);
 
