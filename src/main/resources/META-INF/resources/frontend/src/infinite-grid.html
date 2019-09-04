@@ -45,6 +45,20 @@
                 box-sizing: border-box;
                 position: absolute;
             }
+
+            .frozen > .cell {
+                background-color: #f7f7f7;
+                z-index: 100;
+            }
+
+            .cell.frozen {
+                background-color: #f7f7f7;
+            }
+
+            .frozen > .cell.frozen {
+                z-index: 10;
+             }
+
         </style>
         <div id="scrollarea" class="scrollarea">
             <div id="container" class="container"></div>
@@ -62,8 +76,8 @@
             ready() {
                 super.ready();
                 var that = this;
-
-                this.$.scrollarea.addEventListener('scroll', pos => setTimeout(() => that.onScroll(), 1));
+                this.$.scrollarea.addEventListener('scroll', pos => that.ensureFrozenColumns(), {passive: true});
+                this.$.scrollarea.addEventListener('scroll', pos => that.onScroll(), {passive: true});
             }
 
             static get properties() {
@@ -78,10 +92,12 @@
                 var that = this;
                 this.cellWidth = dimensions.cellWidth;
                 this.cellHeight = dimensions.cellHeight;
+                this.frozenRows = dimensions.frozenRows;
+                this.frozenColumns = dimensions.frozenColumns;
 
                 this.$.container.style.width = dimensions.cellCountX*this.cellWidth+"px";
                 this.$.container.style.height = dimensions.cellCountY*this.cellHeight+"px";
-                setTimeout(() => that.drawGrid(0, 0), 100);
+                setTimeout(() => that.createGrid(), 100);
             }
 
             createTemplate(content) {
@@ -126,27 +142,41 @@
                 });
             }
 
-            drawGrid(initialX, initialY) {
-                this.prePosX = initialX;
-                this.prePosY = initialY;
+            createGrid() {
+                this.prePosX = 0;
+                this.prePosY = 0;
                 let ask = [];
-                this.maxY = Math.ceil(this.$.scrollarea.offsetHeight/this.cellHeight)+this.bufferY;
-                this.maxX = Math.ceil(this.$.scrollarea.offsetWidth/this.cellWidth)+this.bufferX;
+                let maxY = Math.ceil(this.$.scrollarea.offsetHeight/this.cellHeight)+this.bufferY;
+                let maxX = Math.ceil(this.$.scrollarea.offsetWidth/this.cellWidth)+this.bufferX;
                 //Clear possible old nodes
                 this.clearChildren(this.$.container);
 
-                for (var y = initialY; y < this.maxY+initialY; y++) {
+                for (var y = 0; y < maxY; y++) {
                     let row = document.createElement("div");
-                    row.classList.add("row")
-                    row.style.top = ((y-this.bufferY/2)*this.cellHeight)+"px";
+                    row.id = "rid"+y;
+                    row.y = y;
+                    row.classList.add("row");
+
+                    if (y < this.frozenRows) {
+                        row.classList.add("frozen");
+                    }
+
+                    row.style.top = (y*this.cellHeight)+"px";
                     this.$.container.appendChild(row);
 
-                    for (var x = initialX; x < this.maxX+initialX; x++) {
+                    for (var x = 0; x < maxX; x++) {
                         let span = document.createElement('span');
-                        let coord = x+"_"+(y-this.bufferY/2);
+                        let coord = x+"_"+row.y;
                         span.id = "cid"+coord;
+                        span.x = x;
+                        span.y = row.y;
                         ask.push(coord);
                         span.classList.add('cell');
+
+                        if (x < this.frozenColumns) {
+                            span.classList.add("frozen");
+                        }
+
                         span.style.width = this.cellWidth+"px";
                         span.style.height = this.cellHeight+"px";
                         row.appendChild(span);
@@ -154,10 +184,58 @@
 
                         if(this.domTemplate != null) {
                             var template = this.createTemplate(this.domTemplate);
-                            template.x = x;
-                            template.y = (y-this.bufferY/2);
+                            template.x = span.x;
+                            template.y = span.y;
                             span.appendChild(template);
                         }
+                    }
+                }
+
+                if (this.domTemplate == null) {
+                    this.$server.getContent(ask);
+                }
+            }
+
+            ensureNoFrozenY(y) {
+                return y + this.frozenRows;
+            }
+
+            ensureNoFrozenX(x) {
+                return x + this.frozenColumns;
+            }
+
+            drawGrid(initialX, initialY) {
+                this.prePosX = initialX;
+                this.prePosY = initialY;
+                let ask = [];
+
+                let y = this.ensureNoFrozenY(initialY);
+                for(let i = 0; i < this.$.container.childNodes.length; i++) {
+                    let row = this.$.container.childNodes[i];
+
+                    if (!row.classList.contains("frozen")) {
+                        row.id = "rid" + y;
+                        row.y = y;
+                        row.style.top = (y * this.cellHeight) + "px";
+                        y++;
+                    }
+
+                    let x = this.ensureNoFrozenX(initialX);
+                    for (let j = 0; j < row.childNodes.length; j++) {
+                        let cell = row.childNodes[j];
+
+                        if(!cell.classList.contains("frozen")) {
+                            cell.id = "cid" + x + "_" + row.y;
+                            cell.x = x;
+                            cell.y = row.y;
+                            cell.style.left = (cell.x * this.cellWidth) + "px";
+                            x++;
+                        } else {
+                            cell.id = "cid"+ cell.x+"_"+row.y;
+                            cell.y = row.y;
+                        }
+
+                        this.prepareAskContent(cell, ask);
                     }
                 }
 
@@ -172,15 +250,21 @@
                 }
             }
 
-            prepareAskContent(x, y, col, ask) {
-                col.id = "cid"+x+"_"+y;
+            prepareAskContent(col, ask) {
+                if (col.x < 0 ||
+                    col.parentNode.y < 0 ||
+                    col.x >= this.dimensions.cellCountX ||
+                    col.parentNode.y >= this.dimensions.cellCountY) {
+                    return;
+                }
+
                 if (this.domTemplate == null) {
                     col.childNodes.forEach(child => col.removeChild(child));
-                    ask.push(x+"_"+y);
+                    ask.push(col.x+"_"+col.parentNode.y);
                 } else {
                     col.childNodes.forEach(child => {
-                        child.x = x;
-                        child.y = y;
+                        child.x = col.x;
+                        child.y = col.parentNode.y;
                     });
                 }
             }
@@ -188,6 +272,114 @@
             isRedrawingMoreEfficient(changeX, changeY) {
                 return Math.abs(changeY) > (Math.ceil(this.$.scrollarea.offsetHeight/this.cellHeight)+this.bufferY)/2 ||
                     Math.abs(changeX) > (Math.ceil(this.$.scrollarea.offsetWidth/this.cellWidth)+this.bufferX)/2;
+            }
+
+            ensureFrozenColumns() {
+                for (var i = 0; i < this.frozenRows; i++) {
+                    var row = this.$.container.querySelector("#rid"+i);
+                    row.style.top = (this.$.scrollarea.scrollTop + i*this.cellHeight)+"px";
+                }
+
+                this.$.container.childNodes.forEach(row => {
+                    for (var i = 0; i < this.frozenColumns; i++) {
+                        var cell = row.querySelector("#cid" + i+"_"+row.y);
+                        cell.style.left = (this.$.scrollarea.scrollLeft + i*this.cellWidth)+"px";
+                    }
+                });
+            }
+
+            getFirst(container) {
+                for(var i = 0; i < container.childNodes.length; i++) {
+                    if (!container.childNodes[i].classList.contains("frozen")) {
+                        return container.childNodes[i];
+                    }
+                }
+
+                return null;
+            }
+
+            getLast(container) {
+                for(var i = container.childNodes.length-1; i >= 0; i--) {
+                    if (!container.childNodes[i].classList.contains("frozen")) {
+                        return container.childNodes[i];
+                    }
+                }
+
+                return null;
+            }
+
+            onScrollYDown(container, ask) {
+                let first = this.getFirst(container);
+                let last = this.getLast(container);
+                container.removeChild(first);
+                container.appendChild(first);
+                let y = last.y+1;
+                if (y >=0 && y < this.frozenRows) {
+                    y += this.frozenRows;
+                }
+                this.onScrollY(first, y, ask);
+            }
+
+            onScrollYUp(container, ask) {
+                let last = this.getLast(container);
+                let first = this.getFirst(container);
+                container.removeChild(last);
+                container.insertBefore(last, first);
+                let y = first.y-1;
+                if (y >=0 && y < this.frozenRows) {
+                    y -= this.frozenRows;
+                }
+                this.onScrollY(last, y, ask);
+            }
+
+            onScrollY(row, y, ask) {
+                row.style.top = (y*this.cellHeight) + "px";
+                row.y = y;
+                row.id = "rid"+y;
+                row.childNodes.forEach(col => {
+                    let x = Math.floor(col.offsetLeft/this.cellWidth);
+                    col.id = "cid"+col.x+"_"+y;
+                    this.prepareAskContent(col, ask);
+                });
+            }
+
+            onScrollXDown(container, ask) {
+                container.childNodes.forEach(row => {
+                    let first = this.getFirst(row);
+                    let last = this.getLast(row);
+                    row.removeChild(first);
+                    row.appendChild(first);
+
+                    let x = last.x+1;
+                    if (x >= 0 && x < this.frozenColumns) {
+                        x += this.frozenColumns;
+                    }
+
+                    first.style.left = (x*this.cellWidth) + "px";
+                    first.x = x;
+                    first.id = "cid"+x+"_"+first.parentNode.y;
+                    this.prepareAskContent(first, ask);
+                });
+            }
+
+            onScrollXUp(container, ask) {
+                container.childNodes.forEach(row => {
+                    let first = this.getFirst(row);
+                    let last = this.getLast(row);
+                    row.removeChild(last);
+                    row.insertBefore(last, first);
+
+                    let x = first.x-1;
+                    if (x >= 0 && x < this.frozenColumns) {
+                        x -= this.frozenColumns;
+                    }
+
+                    last.style.left = (x*this.cellWidth) + "px";
+                    last.x = x;
+                    last.id = "cid"+x+"_"+last.parentNode.y;
+                    this.prepareAskContent(last, ask);
+                });
+
             }
 
             onScroll() {
@@ -202,62 +394,34 @@
                     return;
                 }
 
-                for (var i = 0; i < Math.abs(changeY) && Math.abs(changeY) >= Math.floor(this.bufferY/2); i++) {
-                    this.prePosY = currY;
-                    if (changeY > 0) {
-                        let first = this.$.container.firstChild;
-                        let last = this.$.container.lastChild;
-                        this.$.container.removeChild(first);
-                        this.$.container.appendChild(first);
-                        let y = Math.floor((last.offsetTop + this.cellHeight)/this.cellHeight);
-                        first.style.top = (y*this.cellHeight) + "px";
-                        first.childNodes.forEach(col => {
-                            this.prepareAskContent(Math.floor(col.offsetLeft/this.cellWidth), y, col, ask);
-                        });
-                    } else {
-                        let last = this.$.container.lastChild;
-                        let first = this.$.container.firstChild;
-                        this.$.container.removeChild(last);
-                        this.$.container.insertBefore(last, first);
-                        let y = Math.floor((first.offsetTop - this.cellHeight)/this.cellHeight);
-                        last.style.top = (y*this.cellHeight) + "px";
-                        last.childNodes.forEach(col => {
-                            this.prepareAskContent(Math.floor(col.offsetLeft/this.cellWidth), y, col, ask);
-                        });
+                let bottom = currY + Math.ceil(this.$.scrollarea.offsetHeight/this.cellHeight);
+                let topVisible = this.$.container.lastChild.y - this.$.container.childNodes.length;
+                let reserveBottom = this.$.container.lastChild.y - bottom + 1;
+                let reserveTop = currY - topVisible - 1;
+
+                this.prePosY = currY;
+                if (changeY > 0 && reserveBottom < 0) {
+                    for (var i = 0; i <  Math.abs(reserveTop); i++) {
+                        this.onScrollYDown(this.$.container, ask);
+                    }
+                } else if (changeY < 0 && reserveTop < 0) {
+                    for (var i = 0; i <  Math.abs(reserveBottom); i++) {
+                        this.onScrollYUp(this.$.container, ask);
                     }
                 }
 
                 for (var i = 0; i < Math.abs(changeX); i++) {
                     if (changeX > 0) {
-                        let x = this.prePosX + this.maxX;
-                        this.$.container.childNodes.forEach(row => {
-                            let first = row.firstChild;
-                            let last = row.lastChild;
-                            row.removeChild(first);
-                            row.appendChild(first);
-                            first.style.left = (x*this.cellWidth) + "px";
-                            this.prepareAskContent(x, Math.floor(row.offsetTop/this.cellHeight), first, ask);
-                        });
+                        this.onScrollXDown(this.$.container, ask);
                         this.prePosX++;
-
                     } else {
-                        let x = this.prePosX-1;
-                        this.$.container.childNodes.forEach(row => {
-                            let first = row.firstChild;
-                            let last = row.lastChild;
-                            row.removeChild(last);
-                            row.insertBefore(last, first);
-                            last.style.left = (x*this.cellWidth) + "px";
-                            this.prepareAskContent(x, Math.floor(row.offsetTop/this.cellHeight), last, ask);
-                        });
-
+                        this.onScrollXUp(this.$.container, ask);
                         this.prePosX--;
                     }
                 }
 
                 if (ask.length > 0) {
-                    let that = this;
-                    setTimeout(() => {that.$server.getContent(ask);}, 1);
+                    this.$server.getContent(ask);
                 }
             }
         }

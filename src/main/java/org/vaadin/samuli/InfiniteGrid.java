@@ -154,6 +154,22 @@ public class InfiniteGrid extends PolymerTemplate<InfiniteGridModel> implements 
   }
 
   /**
+   * Set the number of frozen columns starting from left.
+   * @param columns
+   */
+  public void setFrozenColumns(int columns) {
+    getModel().getDimensions().setFrozenColumns(columns);
+  }
+
+  /**
+   * Set the number of frozen rows starting from top.
+   * @param rows
+   */
+  public void setFrozenRows(int rows) {
+    getModel().getDimensions().setFrozenRows(rows);
+  }
+
+  /**
    * Settings shared with client side.
    */
   public interface InfiniteGridModel extends TemplateModel {
@@ -173,6 +189,8 @@ public class InfiniteGrid extends PolymerTemplate<InfiniteGridModel> implements 
     private Integer cellHeight;
     private Integer cellCountX;
     private Integer cellCountY;
+    private Integer frozenColumns;
+    private Integer frozenRows;
 
     public Integer getCellWidth() {
       return cellWidth;
@@ -204,6 +222,22 @@ public class InfiniteGrid extends PolymerTemplate<InfiniteGridModel> implements 
 
     public void setCellCountY(Integer cellCountY) {
       this.cellCountY = cellCountY;
+    }
+
+    public Integer getFrozenColumns() {
+      return frozenColumns;
+    }
+
+    public void setFrozenColumns(Integer frozenColumns) {
+      this.frozenColumns = frozenColumns;
+    }
+
+    public Integer getFrozenRows() {
+      return frozenRows;
+    }
+
+    public void setFrozenRows(Integer frozenRows) {
+      this.frozenRows = frozenRows;
     }
   }
 
