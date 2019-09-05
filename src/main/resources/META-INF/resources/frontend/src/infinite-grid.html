@@ -11,17 +11,24 @@
                 position: relative;
             }
 
+            #grid {
+                display: flex;
+                flex-direction: column;
+                width: 100%;
+                height: 100%;
+            }
+
             .scrollarea {
-                position: absolute;
-                top: 0;
-                right: 0;
-                bottom: 0;
-                left: 0;
                 padding: 0;
                 margin: 0;
                 overflow: auto;
+                flex: 1 1 100%;
             }
 
+            #headerscrollarea {
+                overflow: hidden;
+                z-index: 100;
+            }
             .container {
                 padding: 0;
                 margin: 0;
@@ -64,9 +71,19 @@
                 z-index: 100;
             }
 
+
+
+
         </style>
-        <div id="scrollarea" class="scrollarea">
-            <div id="container" class="container"></div>
+
+        <div id="grid">
+            <div id="headerscrollarea">
+                <div id="headers" class="container"></div>
+            </div>
+
+            <div id="scrollarea" class="scrollarea">
+                <div id="container" class="container"></div>
+            </div>
         </div>
 
         <div id="storage" class="storage"></div>
@@ -102,6 +119,12 @@
 
                 this.$.container.style.width = dimensions.cellCountX*this.cellWidth+"px";
                 this.$.container.style.height = dimensions.cellCountY*this.cellHeight+"px";
+                this.$.container.style.marginTop = "-"+(this.frozenRows*this.cellHeight)+"px";
+
+                this.$.headers.style.width = dimensions.cellCountX*this.cellWidth+"px";
+                this.$.headers.style.height = this.frozenRows*this.cellHeight+"px";
+                this.$.headerscrollarea.style.flex = "0 0 "+this.$.headers.style.height;
+
                 setTimeout(() => that.createGrid(), 100);
             }
 
@@ -117,7 +140,7 @@
                 let that = this;
                 JSON.parse(json).forEach(celldata => {
                     setTimeout(() => {
-                        let cell = this.$.container.querySelector("#cid"+celldata.x+"_"+celldata.y);
+                        let cell = this.$.grid.querySelector("#cid"+celldata.x+"_"+celldata.y);
                         if (cell != null) {
                             if (celldata.m != null) {
                                 if (this.useDomBind == true) {
@@ -161,13 +184,14 @@
                     row.id = "rid"+y;
                     row.y = y;
                     row.classList.add("row");
+                    row.style.top = (y*this.cellHeight)+"px";
 
                     if (y < this.frozenRows) {
                         row.classList.add("frozen");
+                        this.$.headers.appendChild(row);
+                    } else {
+                        this.$.container.appendChild(row);
                     }
-
-                    row.style.top = (y*this.cellHeight)+"px";
-                    this.$.container.appendChild(row);
 
                     for (var x = 0; x < maxX; x++) {
                         let span = document.createElement('span');
@@ -201,29 +225,20 @@
                 }
             }
 
-            ensureNoFrozenY(y) {
-                return y + this.frozenRows;
-            }
-
             ensureNoFrozenX(x) {
                 return x + this.frozenColumns;
             }
 
-            drawGrid(initialX, initialY) {
-                this.prePosX = initialX;
-                this.prePosY = initialY;
+            drawGrid(container, initialX, initialY) {
                 let ask = [];
 
-                let y = this.ensureNoFrozenY(initialY);
-                for(let i = 0; i < this.$.container.childNodes.length; i++) {
-                    let row = this.$.container.childNodes[i];
-
-                    if (!row.classList.contains("frozen")) {
-                        row.id = "rid" + y;
-                        row.y = y;
-                        row.style.top = (y * this.cellHeight) + "px";
-                        y++;
-                    }
+                let y = initialY;
+                for(let i = 0; i < container.childNodes.length; i++) {
+                    let row = container.childNodes[i];
+                    row.id = "rid" + y;
+                    row.y = y;
+                    row.style.top = (y * this.cellHeight) + "px";
+                    y++;
 
                     let x = this.ensureNoFrozenX(initialX);
                     for (let j = 0; j < row.childNodes.length; j++) {
@@ -280,11 +295,7 @@
             }
 
             ensureFrozenColumns() {
-                for (var i = 0; i < this.frozenRows; i++) {
-                    var row = this.$.container.childNodes[i];
-                    row.style.top = (this.$.scrollarea.scrollTop + i*this.cellHeight)+"px";
-                }
-
+                this.$.headerscrollarea.scrollLeft = this.$.scrollarea.scrollLeft;
                 this.$.container.childNodes.forEach(row => {
                     for (var i = 0; i < this.frozenColumns; i++) {
                         var cell = row.childNodes[i];
@@ -392,10 +403,12 @@
                 let currY = Math.floor(this.$.scrollarea.scrollTop/this.cellHeight);
                 let changeY = currY - this.prePosY;
                 let changeX = currX - this.prePosX;
+                this.prePosY = currY;
+                this.prePosX = currX;
                 var ask = [];
-
                 if (this.isRedrawingMoreEfficient(changeX, changeY) === true) {
-                    this.drawGrid(currX, currY);
+                    this.drawGrid(this.$.container, currX, currY+this.frozenRows);
+                    this.drawGrid(this.$.headers, currX, 0);
                     return;
                 }
 
@@ -408,29 +421,28 @@
 
                 let right = currX + Math.ceil(this.$.scrollarea.offsetWidth/this.cellWidth);
                 let leftVisible = this.$.container.lastChild.lastChild.x - this.$.container.lastChild.childNodes.length;
-                let reserveRight = this.$.container.lastChild.lastChild.x - right + 1;
+                let reserveRight = this.$.container.lastChild.lastChild.x - right;
                 let reserveLeft = currX - leftVisible - 1;
 
-                this.prePosY = currY;
-                this.prePosX = currX;
-
                 if (changeY > 0 && reserveBottom < this.bufferY/bufferCutOff) {
-                    for (var i = 0; i <  Math.abs(reserveTop); i++) {
+                    for (var i = 0; i <  Math.abs(reserveTop-1); i++) {
                         this.onScrollYDown(this.$.container, ask);
                     }
                 } else if (changeY < 0 && reserveTop < this.bufferY/bufferCutOff) {
-                    for (var i = 0; i <  Math.abs(reserveBottom); i++) {
+                    for (var i = 0; i <  Math.abs(reserveBottom-1); i++) {
                         this.onScrollYUp(this.$.container, ask);
                     }
                 }
 
                 if (changeX > 0 && reserveRight < this.bufferX/bufferCutOff) {
-                    for (var i = 0; i <  Math.abs(reserveLeft); i++) {
+                    for (var i = 0; i <  Math.abs(reserveLeft-1); i++) {
                         this.onScrollXDown(this.$.container, ask);
+                        this.onScrollXDown(this.$.headers, ask);
                     }
                 } else if (changeX < 0 && reserveLeft < this.bufferX/bufferCutOff) {
-                    for (var i = 0; i <  Math.abs(reserveRight); i++) {
+                    for (var i = 0; i <  Math.abs(reserveRight-1); i++) {
                         this.onScrollXUp(this.$.container, ask);
+                        this.onScrollXUp(this.$.headers, ask);
                     }
                 }
 
