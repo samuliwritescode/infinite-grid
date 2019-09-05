@@ -48,16 +48,21 @@
 
             .frozen > .cell {
                 background-color: #f7f7f7;
-                z-index: 100;
+                z-index: 50;
             }
 
             .cell.frozen {
                 background-color: #f7f7f7;
+                z-index: 5;
             }
 
             .frozen > .cell.frozen {
                 z-index: 10;
              }
+
+            .row.frozen > .cell.frozen {
+                z-index: 100;
+            }
 
         </style>
         <div id="scrollarea" class="scrollarea">
