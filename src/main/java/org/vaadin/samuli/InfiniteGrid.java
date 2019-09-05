@@ -32,8 +32,8 @@ import java.util.stream.Collectors;
 public class InfiniteGrid extends PolymerTemplate<InfiniteGridModel> implements HasSize {
   private static final int DEFAULT_CELLWIDTH = 200;
   private static final int DEFAULT_CELLHEIGHT = 40;
-  private static final int DEFAULT_BUFFER_X = 3;
-  private static final int DEFAULT_BUFFER_Y = 9;
+  private static final int DEFAULT_BUFFER_X = 4;
+  private static final int DEFAULT_BUFFER_Y = 10;
 
   @Id("storage")
   private Div storage;
@@ -150,7 +150,7 @@ public class InfiniteGrid extends PolymerTemplate<InfiniteGridModel> implements 
    */
   public void setBufferSize(int x, int y) {
     getModel().setBufferX(x);
-    getModel().setBufferY(y*2);
+    getModel().setBufferY(y);
   }
 
   /**

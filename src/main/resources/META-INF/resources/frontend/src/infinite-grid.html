@@ -399,29 +399,38 @@
                     return;
                 }
 
+                let bufferCutOff = 2;
+
                 let bottom = currY + Math.ceil(this.$.scrollarea.offsetHeight/this.cellHeight);
                 let topVisible = this.$.container.lastChild.y - this.$.container.childNodes.length;
                 let reserveBottom = this.$.container.lastChild.y - bottom + 1;
                 let reserveTop = currY - topVisible - 1;
 
+                let right = currX + Math.ceil(this.$.scrollarea.offsetWidth/this.cellWidth);
+                let leftVisible = this.$.container.lastChild.lastChild.x - this.$.container.lastChild.childNodes.length;
+                let reserveRight = this.$.container.lastChild.lastChild.x - right + 1;
+                let reserveLeft = currX - leftVisible - 1;
+
                 this.prePosY = currY;
-                if (changeY > 0 && reserveBottom < 0) {
+                this.prePosX = currX;
+
+                if (changeY > 0 && reserveBottom < this.bufferY/bufferCutOff) {
                     for (var i = 0; i <  Math.abs(reserveTop); i++) {
                         this.onScrollYDown(this.$.container, ask);
                     }
-                } else if (changeY < 0 && reserveTop < 0) {
+                } else if (changeY < 0 && reserveTop < this.bufferY/bufferCutOff) {
                     for (var i = 0; i <  Math.abs(reserveBottom); i++) {
                         this.onScrollYUp(this.$.container, ask);
                     }
                 }
 
-                for (var i = 0; i < Math.abs(changeX); i++) {
-                    if (changeX > 0) {
+                if (changeX > 0 && reserveRight < this.bufferX/bufferCutOff) {
+                    for (var i = 0; i <  Math.abs(reserveLeft); i++) {
                         this.onScrollXDown(this.$.container, ask);
-                        this.prePosX++;
-                    } else {
+                    }
+                } else if (changeX < 0 && reserveLeft < this.bufferX/bufferCutOff) {
+                    for (var i = 0; i <  Math.abs(reserveRight); i++) {
                         this.onScrollXUp(this.$.container, ask);
-                        this.prePosX--;
                     }
                 }
 
