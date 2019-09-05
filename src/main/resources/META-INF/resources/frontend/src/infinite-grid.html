@@ -281,13 +281,13 @@
 
             ensureFrozenColumns() {
                 for (var i = 0; i < this.frozenRows; i++) {
-                    var row = this.$.container.querySelector("#rid"+i);
+                    var row = this.$.container.childNodes[i];
                     row.style.top = (this.$.scrollarea.scrollTop + i*this.cellHeight)+"px";
                 }
 
                 this.$.container.childNodes.forEach(row => {
                     for (var i = 0; i < this.frozenColumns; i++) {
-                        var cell = row.querySelector("#cid" + i+"_"+row.y);
+                        var cell = row.childNodes[i];
                         cell.style.left = (this.$.scrollarea.scrollLeft + i*this.cellWidth)+"px";
                     }
                 });

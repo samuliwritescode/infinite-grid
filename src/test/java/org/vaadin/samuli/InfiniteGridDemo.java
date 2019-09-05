@@ -8,12 +8,12 @@ public class InfiniteGridDemo extends Div {
 
   public InfiniteGridDemo() {
     InfiniteGrid colorGrid = new InfiniteGrid();
-    colorGrid.setFrozenRows(3);
+    colorGrid.setFrozenRows(1);
     colorGrid.setFrozenColumns(1);
     colorGrid.setCellSize(200, 40);
     colorGrid.setItemCount(100, 100);
     colorGrid.setHtmlGenerator((x, y) -> {
-      if (y<3) {
+      if (y<1) {
         return "column"+x;
       }
 
