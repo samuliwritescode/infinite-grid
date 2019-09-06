@@ -11,15 +11,6 @@
                 position: relative;
             }
 
-            #grid {
-                display: block;
-                position: absolute;
-                top: 0;
-                bottom: 0;
-                left: 0;
-                right: 0;
-            }
-
             .scrollarea {
                 position: absolute;
                 top: 0;
@@ -86,14 +77,12 @@
 
         </style>
 
-        <div id="grid">
-            <div id="headerscrollarea">
-                <div id="headers" class="container"></div>
-            </div>
+        <div id="headerscrollarea">
+            <div id="headers" class="container"></div>
+        </div>
 
-            <div id="scrollarea" class="scrollarea">
-                <div id="container" class="container"></div>
-            </div>
+        <div id="scrollarea" class="scrollarea">
+            <div id="container" class="container"></div>
         </div>
 
         <div id="storage" class="storage"></div>
@@ -150,7 +139,11 @@
                 let that = this;
                 JSON.parse(json).forEach(celldata => {
                     setTimeout(() => {
-                        let cell = this.$.grid.querySelector("#cid"+celldata.x+"_"+celldata.y);
+                        let cell = this.$.container.querySelector("#cid"+celldata.x+"_"+celldata.y);
+                        if (cell === null) {
+                            cell = this.$.headers.querySelector("#cid"+celldata.x+"_"+celldata.y);
+                        }
+
                         if (cell != null) {
                             if (celldata.m != null) {
                                 if (this.useDomBind == true) {
