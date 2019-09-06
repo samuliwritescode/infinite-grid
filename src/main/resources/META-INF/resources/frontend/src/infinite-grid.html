@@ -12,20 +12,30 @@
             }
 
             #grid {
-                display: flex;
-                flex-direction: column;
-                width: 100%;
-                height: 100%;
+                display: block;
+                position: absolute;
+                top: 0;
+                bottom: 0;
+                left: 0;
+                right: 0;
             }
 
             .scrollarea {
+                position: absolute;
+                top: 0;
+                bottom: 0;
+                left: 0;
+                right: 0;
                 padding: 0;
                 margin: 0;
                 overflow: auto;
-                flex: 1 1 100%;
             }
 
             #headerscrollarea {
+                position: absolute;
+                top: 0;
+                left: 0;
+                right: 0;
                 overflow: hidden;
                 z-index: 100;
             }
@@ -98,7 +108,7 @@
             ready() {
                 super.ready();
                 var that = this;
-                this.$.scrollarea.addEventListener('scroll', pos => that.ensureFrozenColumns(), {passive: true});
+                this.$.scrollarea.addEventListener('scroll', pos => that.ensureFrozen(), {passive: true});
                 this.$.scrollarea.addEventListener('scroll', pos => that.onScroll(), {passive: true});
             }
 
@@ -123,7 +133,7 @@
 
                 this.$.headers.style.width = dimensions.cellCountX*this.cellWidth+"px";
                 this.$.headers.style.height = this.frozenRows*this.cellHeight+"px";
-                this.$.headerscrollarea.style.flex = "0 0 "+this.$.headers.style.height;
+                this.$.scrollarea.style.marginTop = this.$.headers.style.height;
 
                 setTimeout(() => that.createGrid(), 100);
             }
@@ -294,9 +304,14 @@
                     Math.abs(changeX) > (Math.ceil(this.$.scrollarea.offsetWidth/this.cellWidth)+this.bufferX)/2;
             }
 
-            ensureFrozenColumns() {
+            ensureFrozen() {
                 this.$.headerscrollarea.scrollLeft = this.$.scrollarea.scrollLeft;
-                this.$.container.childNodes.forEach(row => {
+                this.ensureFrozenColumns(this.$.container);
+                this.ensureFrozenColumns(this.$.headers);
+            }
+
+            ensureFrozenColumns(container) {
+                container.childNodes.forEach(row => {
                     for (var i = 0; i < this.frozenColumns; i++) {
                         var cell = row.childNodes[i];
                         cell.style.left = (this.$.scrollarea.scrollLeft + i*this.cellWidth)+"px";
