@@ -5,7 +5,7 @@
 
     <groupId>org.vaadin.samuli</groupId>
     <artifactId>infinitegrid</artifactId>
-    <version>0.4</version>
+    <version>0.5-SNAPSHOT</version>
     <name>InfiniteGrid</name>
     <description>
       InfiniteGrid addon for Vaadin 10+
