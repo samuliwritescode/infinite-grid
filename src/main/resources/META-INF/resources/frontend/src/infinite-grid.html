@@ -314,7 +314,7 @@
                 container.childNodes.forEach(row => {
                     for (var i = 0; i < this.frozenColumns; i++) {
                         var cell = row.childNodes[i];
-                        cell.style.left = (this.$.scrollarea.scrollLeft + i*this.cellWidth)+"px";
+                        cell.style.left = (container.parentNode.scrollLeft + i*this.cellWidth)+"px";
                     }
                 });
             }
