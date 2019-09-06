@@ -340,8 +340,8 @@
             }
 
             onScrollYDown(container, ask) {
-                let first = this.getFirst(container);
-                let last = this.getLast(container);
+                let first = container.firstChild;
+                let last = container.lastChild;
                 container.removeChild(first);
                 container.appendChild(first);
                 let y = last.y+1;
@@ -352,8 +352,8 @@
             }
 
             onScrollYUp(container, ask) {
-                let last = this.getLast(container);
-                let first = this.getFirst(container);
+                let last = container.lastChild;
+                let first = container.firstChild;
                 container.removeChild(last);
                 container.insertBefore(last, first);
                 let y = first.y-1;
