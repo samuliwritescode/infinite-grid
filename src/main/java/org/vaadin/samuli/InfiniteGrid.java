@@ -37,7 +37,6 @@ public class InfiniteGrid extends PolymerTemplate<InfiniteGridModel> implements 
 
   @Id("storage")
   private Div storage;
-  private int maxSize = 0;
 
   private BiFunction<Integer, Integer, String> htmlGenerator = (x,y) -> null;
   private BiFunction<Integer, Integer, Component> componentGenerator = (x,y) -> null;
@@ -79,19 +78,13 @@ public class InfiniteGrid extends PolymerTemplate<InfiniteGridModel> implements 
 
   @ClientCallable
   public void getContent(String[] stuff) {
-    maxSize = Math.max(stuff.length * 4, maxSize);
-    if (storage.getElement().getChildCount() > maxSize) {
-      for (int i = 0; i < maxSize; i++) {
-        storage.getElement().removeChild(0);
-      }
-    }
-
     List<CellData> retvalue = Arrays.stream(stuff).map(str -> {
       String[] pair = str.split("_");
       CellData p = new CellData(Integer.valueOf(pair[0]), Integer.valueOf(pair[1]));
       Optional.ofNullable(htmlGenerator.apply(p.getX(), p.getY())).ifPresent(p::setM);
       Optional.ofNullable(componentGenerator.apply(p.getX(), p.getY())).ifPresent(component -> {
         component.setId("id" + p.getX() + "_" + p.getY());
+        removeStorageComponentById(component.getId().orElse(""));
         storage.add(component);
       });
       return p;
@@ -102,6 +95,11 @@ public class InfiniteGrid extends PolymerTemplate<InfiniteGridModel> implements 
     } catch (JsonProcessingException e) {
       e.printStackTrace();
     }
+  }
+
+  @ClientCallable
+  public void removeStorageComponentById(String id) {
+    storage.remove(storage.getChildren().filter(existing -> existing.getId().orElse("").equals(id)).toArray(Component[]::new));
   }
 
   /**
