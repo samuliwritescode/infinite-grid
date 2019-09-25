@@ -5,7 +5,7 @@
 
     <groupId>org.vaadin.samuli</groupId>
     <artifactId>infinitegrid</artifactId>
-    <version>0.5-SNAPSHOT</version>
+    <version>0.6</version>
     <name>InfiniteGrid</name>
     <description>
       InfiniteGrid addon for Vaadin 10+
@@ -119,7 +119,7 @@
                 <version>9.4.15.v20190215</version>
                 <configuration>
                     <scanIntervalSeconds>-1</scanIntervalSeconds>
-                    <!-- Use test scope because the UI/demo classes are in 
+                    <!-- Use test scope because the UI/demo classes are in
                         the test package. -->
                     <useTestScope>true</useTestScope>
                     <systemProperties>
@@ -134,7 +134,7 @@
                       </systemProperty>
                     </systemProperties>
                     <webAppConfig>
-                        <!-- This is only needed to be able to unzip webjars 
+                        <!-- This is only needed to be able to unzip webjars
                             directly into src/test/webjar-debug and modify them for testing -->
                         <resourceBases>
                           <resourceBase>src/main/resources/META-INF/resources/</resourceBase>
