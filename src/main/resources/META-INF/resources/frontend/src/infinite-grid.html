@@ -136,9 +136,8 @@
             }
 
             setContent(json) {
-                let that = this;
-                JSON.parse(json).forEach(celldata => {
-                    setTimeout(() => {
+                setTimeout(() => {
+                    JSON.parse(json).forEach(celldata => {
                         let cell = this.$.container.querySelector("#cid"+celldata.x+"_"+celldata.y);
                         if (cell === null) {
                             cell = this.$.headers.querySelector("#cid"+celldata.x+"_"+celldata.y);
@@ -173,8 +172,8 @@
                             }
                             console.info("no cid"+celldata.x+"_"+celldata.y)
                         }
-                    }, 1);
-                });
+                    });
+                }, 1);
             }
 
             createGrid() {
