@@ -102,6 +102,11 @@ public class InfiniteGrid extends PolymerTemplate<InfiniteGridModel> implements 
     storage.remove(storage.getChildren().filter(existing -> existing.getId().orElse("").equals(id)).toArray(Component[]::new));
   }
 
+  @ClientCallable
+  public void cleanStorage() {
+    storage.removeAll();
+  }
+
   /**
    * Set cell size in pixels. All cells will be with same size.
    * @param width

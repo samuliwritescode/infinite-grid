@@ -97,6 +97,8 @@
             ready() {
                 super.ready();
                 var that = this;
+                this.requestsInProgress = 0;
+                this.requestsAllowed = 2;
                 this.$.scrollarea.addEventListener('scroll', pos => that.ensureFrozen(), {passive: true});
                 this.$.scrollarea.addEventListener('scroll', pos => that.onScroll(), {passive: true});
             }
@@ -136,6 +138,15 @@
             }
 
             setContent(json) {
+                if (this.requestsInProgress > this.requestsAllowed) {
+                    this.requestsInProgress = 0;
+                    this.$server.cleanStorage();
+                    this.redrawGrid();
+                    return;
+                } else {
+                    this.requestsInProgress--;
+                }
+
                 setTimeout(() => {
                     JSON.parse(json).forEach(celldata => {
                         let cell = this.$.container.querySelector("#cid"+celldata.x+"_"+celldata.y);
@@ -176,12 +187,20 @@
                 }, 1);
             }
 
+            getWidthInCells() {
+                return Math.ceil(this.$.scrollarea.offsetWidth/this.cellWidth)+this.bufferX;
+            }
+
+            getHeightInCells() {
+                return Math.ceil(this.$.scrollarea.offsetHeight/this.cellHeight)+this.bufferY;
+            }
+
             createGrid() {
                 this.prePosX = 0;
                 this.prePosY = 0;
                 let ask = [];
-                let maxY = Math.ceil(this.$.scrollarea.offsetHeight/this.cellHeight)+this.bufferY;
-                let maxX = Math.ceil(this.$.scrollarea.offsetWidth/this.cellWidth)+this.bufferX;
+                let maxX = this.getWidthInCells();
+                let maxY = this.getHeightInCells();
                 //Clear possible old nodes
                 this.clearChildren(this.$.container);
 
@@ -227,7 +246,7 @@
                 }
 
                 if (this.domTemplate == null) {
-                    this.$server.getContent(ask);
+                    this.fetchFromServer(ask);
                 }
             }
 
@@ -266,8 +285,10 @@
                 }
 
                 if (this.domTemplate == null) {
-                    this.$server.getContent(ask);
+                    return ask;
                 }
+
+                return [];
             }
 
             clearChildren(node) {
@@ -409,17 +430,24 @@
 
             }
 
+            getCurrentX() {
+                return Math.floor(this.$.scrollarea.scrollLeft/this.cellWidth);
+            }
+
+            getCurrentY() {
+                return Math.floor(this.$.scrollarea.scrollTop/this.cellHeight);
+            }
+
             onScroll() {
-                let currX = Math.floor(this.$.scrollarea.scrollLeft/this.cellWidth);
-                let currY = Math.floor(this.$.scrollarea.scrollTop/this.cellHeight);
+                let currX = this.getCurrentX();
+                let currY = this.getCurrentY();
                 let changeY = currY - this.prePosY;
                 let changeX = currX - this.prePosX;
                 this.prePosY = currY;
                 this.prePosX = currX;
                 var ask = [];
                 if (this.isRedrawingMoreEfficient(changeX, changeY) === true) {
-                    this.drawGrid(this.$.container, currX, currY+this.frozenRows);
-                    this.drawGrid(this.$.headers, currX, 0);
+                    this.redrawGrid();
                     return;
                 }
 
@@ -457,11 +485,26 @@
                     }
                 }
 
-                if (ask.length > 0) {
-                    this.$server.getContent(ask);
+                this.fetchFromServer(ask);
+            }
+
+            redrawGrid() {
+                let ask = this.drawGrid(this.$.container, this.getCurrentX(), this.getCurrentY()+this.frozenRows)
+                    .concat(this.drawGrid(this.$.headers, this.getCurrentX(), 0));
+                this.fetchFromServer(ask);
+            }
+
+            fetchFromServer(ask) {
+                if(ask.length > 0) {
+                    if (this.requestsInProgress <= this.requestsAllowed) {
+                        this.$server.getContent(ask);
+                    }
+
+                    this.requestsInProgress++;
                 }
             }
         }
+
         customElements.define(InfiniteGrid.is, InfiniteGrid);
     </script>
 </dom-module>
