@@ -172,16 +172,12 @@
                                 if (c != null) {
                                     this.clearChildren(cell);
                                     cell.appendChild(c);
-                                } else {
-                                    this.$server.removeStorageComponentById("id"+celldata.x+"_"+celldata.y);
-                                    console.info("cannot find "+celldata.x+"_"+celldata.y);
                                 }
                             }
                         } else {
                             if (celldata.m == null) {
                                 this.$server.removeStorageComponentById("id" + celldata.x + "_" + celldata.y);
                             }
-                            console.info("no cid"+celldata.x+"_"+celldata.y)
                         }
                     });
                 }, 1);
