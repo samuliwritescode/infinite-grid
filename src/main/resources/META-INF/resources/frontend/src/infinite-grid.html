@@ -302,13 +302,16 @@
                 }
 
                 if (this.domTemplate == null) {
-                    col.childNodes.forEach(child => col.removeChild(child));
+                    for (var i = 0; i < col.childNodes.length; i++) {
+                        col.removeChild(col.childNodes[i]);
+                    }
                     ask.push(col.x+"_"+col.parentNode.y);
                 } else {
-                    col.childNodes.forEach(child => {
+                    for(var i = 0; i < col.childNodes.length; i++) {
+                        var child = col.childNodes[i];
                         child.x = col.x;
                         child.y = col.parentNode.y;
-                    });
+                    }
                 }
             }
 
@@ -324,12 +327,13 @@
             }
 
             ensureFrozenColumns(container) {
-                container.childNodes.forEach(row => {
+                for (var j = 0; j < container.childNodes.length; j++) {
+                    var row = container.childNodes[j];
                     for (var i = 0; i < this.frozenColumns; i++) {
                         var cell = row.childNodes[i];
                         cell.style.left = (container.parentNode.scrollLeft + i*this.cellWidth)+"px";
                     }
-                });
+                }
             }
 
             getFirst(container) {
@@ -380,15 +384,17 @@
                 row.style.top = (y*this.cellHeight) + "px";
                 row.y = y;
                 row.id = "rid"+y;
-                row.childNodes.forEach(col => {
+                for (var i = 0; i < row.childNodes.length; i++) {
+                    var col = row.childNodes[i];
                     let x = Math.floor(col.offsetLeft/this.cellWidth);
                     col.id = "cid"+col.x+"_"+y;
                     this.prepareAskContent(col, ask);
-                });
+                }
             }
 
             onScrollXDown(container, ask) {
-                container.childNodes.forEach(row => {
+                for (var i = 0; i < container.childNodes.length; i++) {
+                    var row = container.childNodes[i];
                     let first = this.getFirst(row);
                     let last = this.getLast(row);
                     row.removeChild(first);
@@ -403,11 +409,12 @@
                     first.x = x;
                     first.id = "cid"+x+"_"+first.parentNode.y;
                     this.prepareAskContent(first, ask);
-                });
+                }
             }
 
             onScrollXUp(container, ask) {
-                container.childNodes.forEach(row => {
+                for (var i = 0; i < container.childNodes.length; i++) {
+                    var row = container.childNodes[i];
                     let first = this.getFirst(row);
                     let last = this.getLast(row);
                     row.removeChild(last);
@@ -422,8 +429,7 @@
                     last.x = x;
                     last.id = "cid"+x+"_"+last.parentNode.y;
                     this.prepareAskContent(last, ask);
-                });
-
+                }
             }
 
             getCurrentX() {
