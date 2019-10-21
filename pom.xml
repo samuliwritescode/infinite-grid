@@ -100,6 +100,9 @@
                 <artifactId>maven-jar-plugin</artifactId>
                 <version>3.0.2</version>
                 <configuration>
+                  <excludes>
+                    <exclude>META-INF/VAADIN/config/flow-build-info.json</exclude>
+                  </excludes>
                     <archive>
                         <index>true</index>
                         <manifest>
