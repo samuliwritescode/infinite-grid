@@ -1,6 +1,7 @@
 package org.vaadin.samuli;
 
 import com.vaadin.flow.component.html.Div;
+import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.router.Route;
 
 @Route("")
@@ -10,7 +11,7 @@ public class InfiniteGridDemo extends Div {
     InfiniteGrid colorGrid = new InfiniteGrid();
     colorGrid.setFrozenRows(1);
     colorGrid.setFrozenColumns(1);
-    colorGrid.setCellSize(200, 40);
+    colorGrid.setCellSize(300, 40);
     colorGrid.setItemCount(100, 100);
     colorGrid.setHtmlGenerator((x, y) -> {
       if (y<1) {
@@ -24,8 +25,12 @@ public class InfiniteGridDemo extends Div {
     });
 
     setSizeFull();
-    colorGrid.setSizeFull();
-    getElement().getStyle().set("overflow", "hidden");
+    colorGrid.setHeight("500px");
+    colorGrid.setWidth("100%");
+    add(new TextField("Item count", e -> colorGrid.setItemCount(Integer.parseInt(e.getValue()), Integer.parseInt(e.getValue()))));
+    add(new TextField("Cellsize", e -> colorGrid.setCellSize(Integer.parseInt(e.getValue()), 40)));
+    add(new TextField("Frozen columns", e -> colorGrid.setFrozenColumns(Integer.parseInt(e.getValue()))));
+    add(new TextField("Frozen rows", e -> colorGrid.setFrozenRows(Integer.parseInt(e.getValue()))));
     add(colorGrid);
   }
 }

@@ -113,8 +113,10 @@ public class InfiniteGrid extends PolymerTemplate<InfiniteGridModel> implements 
    * @param height
    */
   public void setCellSize(int width, int height) {
-    getModel().getDimensions().setCellWidth(width);
-    getModel().getDimensions().setCellHeight(height);
+    Dimensions dimensions = getModel().getDimensions();
+    dimensions.setCellWidth(width);
+    dimensions.setCellHeight(height);
+    getModel().setDimensions(dimensions);
   }
 
   /**
@@ -123,8 +125,10 @@ public class InfiniteGrid extends PolymerTemplate<InfiniteGridModel> implements 
    * @param y number of vertical cells.
    */
   public void setItemCount(int x, int y) {
-    getModel().getDimensions().setCellCountX(x);
-    getModel().getDimensions().setCellCountY(y);
+    Dimensions dimensions = getModel().getDimensions();
+    dimensions.setCellCountX(x);
+    dimensions.setCellCountY(y);
+    getModel().setDimensions(dimensions);
   }
 
   /**
@@ -161,7 +165,9 @@ public class InfiniteGrid extends PolymerTemplate<InfiniteGridModel> implements 
    * @param columns
    */
   public void setFrozenColumns(int columns) {
-    getModel().getDimensions().setFrozenColumns(columns);
+    Dimensions dimensions = getModel().getDimensions();
+    dimensions.setFrozenColumns(columns);
+    getModel().setDimensions(dimensions);
   }
 
   /**
@@ -169,7 +175,9 @@ public class InfiniteGrid extends PolymerTemplate<InfiniteGridModel> implements 
    * @param rows
    */
   public void setFrozenRows(int rows) {
-    getModel().getDimensions().setFrozenRows(rows);
+    Dimensions dimensions = getModel().getDimensions();
+    dimensions.setFrozenRows(rows);
+    getModel().setDimensions(dimensions);
   }
 
   /**

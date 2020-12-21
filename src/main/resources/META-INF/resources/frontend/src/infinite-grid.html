@@ -199,6 +199,7 @@
                 let maxY = this.getHeightInCells();
                 //Clear possible old nodes
                 this.clearChildren(this.$.container);
+                this.clearChildren(this.$.headers);
 
                 for (var y = 0; y < maxY; y++) {
                     let row = document.createElement("div");
