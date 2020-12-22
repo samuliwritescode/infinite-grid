@@ -112,7 +112,6 @@
             }
 
             dimensionsChanged(dimensions) {
-                var that = this;
                 this.cellWidth = dimensions.cellWidth;
                 this.cellHeight = dimensions.cellHeight;
                 this.frozenRows = dimensions.frozenRows;
@@ -126,7 +125,7 @@
                 this.$.headers.style.height = this.frozenRows*this.cellHeight+"px";
                 this.$.scrollarea.style.marginTop = this.$.headers.style.height;
 
-                setTimeout(() => that.createGrid(), 100);
+                this.refresh();
             }
 
             createTemplate(content) {
@@ -135,6 +134,11 @@
                 dbind.appendChild(template);
                 template.innerHTML = content;
                 return dbind;
+            }
+
+            refresh() {
+                var that = this;
+                setTimeout(() => that.createGrid(), 100);
             }
 
             setContent(json) {

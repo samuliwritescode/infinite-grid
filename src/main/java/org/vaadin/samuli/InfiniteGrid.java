@@ -97,6 +97,13 @@ public class InfiniteGrid extends PolymerTemplate<InfiniteGridModel> implements 
     }
   }
 
+  /**
+   * Refresh the content. Use case: When the data changes.
+   */
+  public void refresh() {
+    getElement().callFunction("refresh");
+  }
+
   @ClientCallable
   public void removeStorageComponentById(String id) {
     storage.remove(storage.getChildren().filter(existing -> existing.getId().orElse("").equals(id)).toArray(Component[]::new));

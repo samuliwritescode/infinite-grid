@@ -1,5 +1,6 @@
 package org.vaadin.samuli;
 
+import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.html.Div;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.router.Route;
@@ -31,6 +32,7 @@ public class InfiniteGridDemo extends Div {
     add(new TextField("Cellsize", e -> colorGrid.setCellSize(Integer.parseInt(e.getValue()), 40)));
     add(new TextField("Frozen columns", e -> colorGrid.setFrozenColumns(Integer.parseInt(e.getValue()))));
     add(new TextField("Frozen rows", e -> colorGrid.setFrozenRows(Integer.parseInt(e.getValue()))));
+    add(new Button("Refresh", e -> colorGrid.refresh()));
     add(colorGrid);
   }
 }
