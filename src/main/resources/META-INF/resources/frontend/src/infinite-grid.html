@@ -138,7 +138,7 @@
 
             refresh() {
                 var that = this;
-                setTimeout(() => that.createGrid(), 100);
+                setTimeout(() => that.createGridRowsAndCells(), 100);
             }
 
             setContent(json) {
@@ -187,20 +187,20 @@
                 }, 1);
             }
 
-            getWidthInCells() {
+            getHorizontalCellCountPlusBuffer() {
                 return Math.ceil(this.$.scrollarea.offsetWidth/this.cellWidth)+this.bufferX;
             }
 
-            getHeightInCells() {
+            getVerticalCellCountPlusBuffer() {
                 return Math.ceil(this.$.scrollarea.offsetHeight/this.cellHeight)+this.bufferY;
             }
 
-            createGrid() {
+            createGridRowsAndCells() {
                 this.prePosX = 0;
                 this.prePosY = 0;
                 let ask = [];
-                let maxX = this.getWidthInCells();
-                let maxY = this.getHeightInCells();
+                let maxX = this.getHorizontalCellCountPlusBuffer();
+                let maxY = this.getVerticalCellCountPlusBuffer();
                 //Clear possible old nodes
                 this.clearChildren(this.$.container);
                 this.clearChildren(this.$.headers);
@@ -220,28 +220,28 @@
                     }
 
                     for (var x = 0; x < maxX; x++) {
-                        let span = document.createElement('span');
+                        let cell = document.createElement('span');
                         let coord = x+"_"+row.y;
-                        span.id = "cid"+coord;
-                        span.x = x;
-                        span.y = row.y;
+                        cell.id = "cid"+coord;
+                        cell.x = x;
+                        cell.y = row.y;
                         ask.push(coord);
-                        span.classList.add('cell');
+                        cell.classList.add('cell');
 
                         if (x < this.frozenColumns) {
-                            span.classList.add("frozen");
+                            cell.classList.add("frozen");
                         }
 
-                        span.style.width = this.cellWidth+"px";
-                        span.style.height = this.cellHeight+"px";
-                        row.appendChild(span);
-                        span.style.left = (x*this.cellWidth)+"px";
+                        cell.style.width = this.cellWidth+"px";
+                        cell.style.height = this.cellHeight+"px";
+                        row.appendChild(cell);
+                        cell.style.left = (x*this.cellWidth)+"px";
 
                         if(this.domTemplate != null) {
                             var template = this.createTemplate(this.domTemplate);
-                            template.x = span.x;
-                            template.y = span.y;
-                            span.appendChild(template);
+                            template.x = cell.x;
+                            template.y = cell.y;
+                            cell.appendChild(template);
                         }
                     }
                 }
@@ -258,7 +258,7 @@
                 return x + this.frozenColumns;
             }
 
-            drawGrid(container, initialX, initialY) {
+            calculatePositionsForRowsAndCells(container, initialX, initialY) {
                 let ask = [];
 
                 let y = initialY;
@@ -284,7 +284,7 @@
                             cell.y = row.y;
                         }
 
-                        this.prepareAskContent(cell, ask);
+                        this.clearCellAndAskContentFromServer(cell, ask);
                     }
                 }
 
@@ -301,24 +301,24 @@
                 }
             }
 
-            prepareAskContent(col, ask) {
-                if (col.x < 0 ||
-                    col.parentNode.y < 0 ||
-                    col.x >= this.dimensions.cellCountX ||
-                    col.parentNode.y >= this.dimensions.cellCountY) {
+            clearCellAndAskContentFromServer(cell, ask) {
+                if (cell.x < 0 ||
+                    cell.parentNode.y < 0 ||
+                    cell.x >= this.dimensions.cellCountX ||
+                    cell.parentNode.y >= this.dimensions.cellCountY) {
                     return;
                 }
 
                 if (this.domTemplate == null) {
-                    for (var i = 0; i < col.childNodes.length; i++) {
-                        col.removeChild(col.childNodes[i]);
+                    for (let i = 0; i < cell.childNodes.length; i++) {
+                        cell.removeChild(cell.childNodes[i]);
                     }
-                    ask.push(col.x+"_"+col.parentNode.y);
+                    ask.push(cell.x+"_"+cell.parentNode.y);
                 } else {
-                    for(var i = 0; i < col.childNodes.length; i++) {
-                        var child = col.childNodes[i];
-                        child.x = col.x;
-                        child.y = col.parentNode.y;
+                    for(let i = 0; i < cell.childNodes.length; i++) {
+                        var child = cell.childNodes[i];
+                        child.x = cell.x;
+                        child.y = cell.parentNode.y;
                     }
                 }
             }
@@ -396,7 +396,7 @@
                     var col = row.childNodes[i];
                     let x = Math.floor(col.offsetLeft/this.cellWidth);
                     col.id = "cid"+col.x+"_"+y;
-                    this.prepareAskContent(col, ask);
+                    this.clearCellAndAskContentFromServer(col, ask);
                 }
             }
 
@@ -416,7 +416,7 @@
                     first.style.left = (x*this.cellWidth) + "px";
                     first.x = x;
                     first.id = "cid"+x+"_"+first.parentNode.y;
-                    this.prepareAskContent(first, ask);
+                    this.clearCellAndAskContentFromServer(first, ask);
                 }
             }
 
@@ -436,7 +436,7 @@
                     last.style.left = (x*this.cellWidth) + "px";
                     last.x = x;
                     last.id = "cid"+x+"_"+last.parentNode.y;
-                    this.prepareAskContent(last, ask);
+                    this.clearCellAndAskContentFromServer(last, ask);
                 }
             }
 
@@ -499,8 +499,8 @@
             }
 
             redrawGrid() {
-                let ask = this.drawGrid(this.$.container, this.getCurrentX(), this.getCurrentY()+this.frozenRows)
-                    .concat(this.drawGrid(this.$.headers, this.getCurrentX(), 0));
+                let ask = this.calculatePositionsForRowsAndCells(this.$.container, this.getCurrentX(), this.getCurrentY()+this.frozenRows)
+                    .concat(this.calculatePositionsForRowsAndCells(this.$.headers, this.getCurrentX(), 0));
                 this.fetchFromServer(ask);
             }
 
