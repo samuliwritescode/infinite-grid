@@ -249,6 +249,9 @@
                 if (this.domTemplate == null) {
                     this.fetchFromServer(ask);
                 }
+
+                this.onScroll();
+                this.ensureFrozen();
             }
 
             ensureNoFrozenX(x) {
