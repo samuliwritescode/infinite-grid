@@ -137,8 +137,7 @@
             }
 
             refresh() {
-                var that = this;
-                setTimeout(() => that.createGridRowsAndCells(), 100);
+                setTimeout(() => this.createGridRowsAndCells(), 100);
             }
 
             setContent(json) {
@@ -187,11 +186,11 @@
                 }, 1);
             }
 
-            getHorizontalCellCountPlusBuffer() {
+            getMaxX() {
                 return Math.ceil(this.$.scrollarea.offsetWidth/this.cellWidth)+this.bufferX;
             }
 
-            getVerticalCellCountPlusBuffer() {
+            getMaxY() {
                 return Math.ceil(this.$.scrollarea.offsetHeight/this.cellHeight)+this.bufferY;
             }
 
@@ -199,8 +198,8 @@
                 this.prePosX = 0;
                 this.prePosY = 0;
                 let ask = [];
-                let maxX = this.getHorizontalCellCountPlusBuffer();
-                let maxY = this.getVerticalCellCountPlusBuffer();
+                let maxX = this.getMaxX();
+                let maxY = this.getMaxY();
                 //Clear possible old nodes
                 this.clearChildren(this.$.container);
                 this.clearChildren(this.$.headers);
