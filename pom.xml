@@ -5,17 +5,17 @@
 
     <groupId>org.vaadin.samuli</groupId>
     <artifactId>infinitegrid</artifactId>
-    <version>0.7</version>
+    <version>0.8</version>
     <name>InfiniteGrid</name>
     <description>
-      InfiniteGrid addon for Vaadin 10+
+      InfiniteGrid addon for Vaadin 23+
     </description>
 
     <properties>
-        <vaadin.version>14.0.2</vaadin.version>
+        <vaadin.version>24.0.0.alpha6</vaadin.version>
 
-        <maven.compiler.source>1.8</maven.compiler.source>
-        <maven.compiler.target>1.8</maven.compiler.target>
+        <maven.compiler.source>17</maven.compiler.source>
+        <maven.compiler.target>17</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
     </properties>
@@ -44,19 +44,20 @@
     <repositories>
         <repository>
             <id>Vaadin Directory</id>
-            <url>http://maven.vaadin.com/vaadin-addons</url>
+            <url>https://maven.vaadin.com/vaadin-addons</url>
         </repository>
         <repository>
             <id>Vaadin prereleases</id>
-            <url>http://maven.vaadin.com/vaadin-prereleases</url>
-        </repository>
-        <!-- The bintray repository contain webjars immediately after generation. If the webjar is available
-             in Maven central, you do not need this repository -->
-        <repository>
-            <id>webjars</id>
-            <url>https://dl.bintray.com/webjars/maven</url>
+            <url>https://maven.vaadin.com/vaadin-prereleases</url>
         </repository>
     </repositories>
+
+    <pluginRepositories>
+        <pluginRepository>
+            <id>Vaadin PreRelease plugins</id>
+            <url>https://maven.vaadin.com/vaadin-prereleases</url>
+        </pluginRepository>
+    </pluginRepositories>
 
     <dependencies>
         <dependency>
@@ -66,12 +67,12 @@
         <dependency>
             <groupId>com.fasterxml.jackson.core</groupId>
             <artifactId>jackson-core</artifactId>
-            <version>2.9.6</version>
+            <version>2.14.1</version>
         </dependency>
         <dependency>
             <groupId>com.fasterxml.jackson.core</groupId>
             <artifactId>jackson-databind</artifactId>
-            <version>2.12.7.1</version>
+            <version>2.14.1</version>
         </dependency>
         <dependency>
             <groupId>org.slf4j</groupId>
@@ -101,7 +102,6 @@
                 <version>3.0.2</version>
                 <configuration>
                   <excludes>
-                    <exclude>META-INF/VAADIN/config/flow-build-info.json</exclude>
                   </excludes>
                     <archive>
                         <index>true</index>
@@ -119,30 +119,11 @@
             <plugin>
                 <groupId>org.eclipse.jetty</groupId>
                 <artifactId>jetty-maven-plugin</artifactId>
-                <version>9.4.15.v20190215</version>
+                <version>11.0.13</version>
                 <configuration>
-                    <scanIntervalSeconds>-1</scanIntervalSeconds>
                     <!-- Use test scope because the UI/demo classes are in
                         the test package. -->
                     <useTestScope>true</useTestScope>
-                    <systemProperties>
-                      <force>true</force>
-                      <systemProperty>
-                        <name>vaadin.compatibilityMode</name>
-                        <value>true</value>
-                      </systemProperty>
-                      <systemProperty>
-                        <name>vaadin.bowerMode</name>
-                        <value>true</value>
-                      </systemProperty>
-                    </systemProperties>
-                    <webAppConfig>
-                        <!-- This is only needed to be able to unzip webjars
-                            directly into src/test/webjar-debug and modify them for testing -->
-                        <resourceBases>
-                          <resourceBase>src/main/resources/META-INF/resources/</resourceBase>
-                        </resourceBases>
-                    </webAppConfig>
                     <supportedPackagings>
                         <supportedPackaging>jar</supportedPackaging>
                     </supportedPackagings>
@@ -159,20 +140,6 @@
                     <plugin>
                       <groupId>com.vaadin</groupId>
                       <artifactId>vaadin-maven-plugin</artifactId>
-                      <executions>
-                        <execution>
-                          <phase>generate-resources</phase>
-                          <goals>
-                            <goal>migrate-to-p3</goal>
-                          </goals>
-                        </execution>
-                      </executions>
-                      <configuration>
-                        <resources>${project.basedir}/src/main/resources/META-INF/resources/frontend/</resources>
-                        <frontendDirectory>${project.basedir}/src/main/resources/META-INF/resources/frontend/</frontendDirectory>
-                        <keepOriginal>true</keepOriginal>
-                        <annotationsRewrite>SKIP</annotationsRewrite>
-                      </configuration>
                     </plugin>
                     <plugin>
                         <groupId>org.apache.maven.plugins</groupId>

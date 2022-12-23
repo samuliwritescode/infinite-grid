@@ -4,3 +4,10 @@ node_modules/
 *.iml
 .DS_Store
 target/
+/frontend/index.html
+
+frontend/generated/
+/vite.generated.ts
+/package.json
+/types.d.ts
+/tsconfig.json
