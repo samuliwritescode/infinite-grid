@@ -91,10 +91,6 @@ class InfiniteGrid extends LitElement {
 `;
   }
 
-  static get is() {
-      return 'infinite-grid'
-  }
-
   connectedCallback() {
       super.connectedCallback();
       var that = this;
@@ -138,10 +134,8 @@ class InfiniteGrid extends LitElement {
   }
 
   createTemplate(content) {
-      var dbind = document.createElement('dom-bind');
-      var template = document.createElement('template');
-      dbind.appendChild(template);
-      template.innerHTML = content;
+      var dbind = document.createElement('span');
+      dbind.innerHTML = content;
       return dbind;
   }
 
@@ -523,5 +517,5 @@ class InfiniteGrid extends LitElement {
   }
 }
 
-customElements.define(InfiniteGrid.is, InfiniteGrid);
+customElements.define('infinite-grid', InfiniteGrid);
 

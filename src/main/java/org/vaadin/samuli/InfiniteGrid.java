@@ -52,10 +52,10 @@ public class InfiniteGrid extends LitTemplate implements HasSize {
      * When setUseDomBind is set to true x and y coordinates
      * are provided as polymer data model like [[x]] and [[y]]
      *
-     * @param textGenerator
+     * @param htmlGenerator
      */
-    public void setHtmlGenerator(BiFunction<Integer, Integer, String> textGenerator) {
-        this.htmlGenerator = textGenerator;
+    public void setHtmlGenerator(BiFunction<Integer, Integer, String> htmlGenerator) {
+        this.htmlGenerator = htmlGenerator;
     }
 
     /**
@@ -64,7 +64,7 @@ public class InfiniteGrid extends LitTemplate implements HasSize {
      * @param template
      */
     public void setTemplateGenerator(String template) {
-      getElement().setProperty("domTemplate", template);
+        getElement().setProperty("domTemplate", template);
     }
 
     /**
