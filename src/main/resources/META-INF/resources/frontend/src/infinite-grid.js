@@ -134,9 +134,9 @@ class InfiniteGrid extends LitElement {
   }
 
   createTemplate(content) {
-      var dbind = document.createElement('span');
-      dbind.innerHTML = content;
-      return dbind;
+    var slot = document.createElement('slot');
+    slot.innerHTML = content;
+	return slot.firstChild;
   }
 
   refresh() {
