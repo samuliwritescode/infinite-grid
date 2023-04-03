@@ -123,11 +123,9 @@ public class InfiniteGrid extends LitTemplate implements HasSize {
      * @param height
      */
     public void setCellSize(int width, int height) {
-//        Dimensions dimensions = getModel().getDimensions();
         dimensions.setCellWidth(width);
         dimensions.setCellHeight(height);
         getElement().setPropertyBean("dimensions", dimensions);
-//        getModel().setDimensions(dimensions);
     }
 
     /**
@@ -137,11 +135,9 @@ public class InfiniteGrid extends LitTemplate implements HasSize {
      * @param y number of vertical cells.
      */
     public void setItemCount(int x, int y) {
-//        Dimensions dimensions = getModel().getDimensions();
         dimensions.setCellCountX(x);
         dimensions.setCellCountY(y);
         getElement().setPropertyBean("dimensions", dimensions);
-//        getModel().setDimensions(dimensions);
     }
 
     /**
@@ -182,10 +178,8 @@ public class InfiniteGrid extends LitTemplate implements HasSize {
      * @param columns
      */
     public void setFrozenColumns(int columns) {
-//        Dimensions dimensions = getModel().getDimensions();
         dimensions.setFrozenColumns(columns);
         getElement().setPropertyBean("dimensions", dimensions);
-//        getModel().setDimensions(dimensions);
     }
 
     /**
@@ -194,10 +188,8 @@ public class InfiniteGrid extends LitTemplate implements HasSize {
      * @param rows
      */
     public void setFrozenRows(int rows) {
-//        Dimensions dimensions = getModel().getDimensions();
         dimensions.setFrozenRows(rows);
         getElement().setPropertyBean("dimensions", dimensions);
-//        getModel().setDimensions(dimensions);
     }
 
     public static class Dimensions {
