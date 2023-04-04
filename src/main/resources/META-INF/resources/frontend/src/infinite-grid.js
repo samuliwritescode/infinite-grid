@@ -111,7 +111,7 @@ class InfiniteGrid extends LitElement {
   }
 
   updated(changedProperties) {
-    if (changedProperties.get('dimensions')) {
+    if (changedProperties.has('dimensions')) {
         this.dimensionsChanged(this.dimensions);
     }
   }
