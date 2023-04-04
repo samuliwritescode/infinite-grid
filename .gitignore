@@ -11,3 +11,4 @@ frontend/generated/
 /package.json
 /types.d.ts
 /tsconfig.json
+/src/main/dev-bundle/
