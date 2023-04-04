@@ -106,7 +106,7 @@ class InfiniteGrid extends LitElement {
       return {
           dimensions: {type: Object, observer: 'dimensionsChanged'},
           textOnly: {type: Boolean},
-          useDomBind: {type: Boolean}
+          setXYAttributes: {type: Boolean}
       }
   }
 
@@ -133,7 +133,7 @@ class InfiniteGrid extends LitElement {
       this.refresh();
   }
 
-  createTemplate(content) {
+  createElementFromString(content) {
     var slot = document.createElement('slot');
     slot.innerHTML = content;
 	return slot.firstChild;
@@ -162,8 +162,8 @@ class InfiniteGrid extends LitElement {
 
               if (cell != null) {
                   if (celldata.m != null) {
-                      if (this.useDomBind == true) {
-                          var template = this.createTemplate(celldata.m);
+                      if (this.setXYAttributes == true) {
+                          var template = this.createElementFromString(celldata.m);
                           template.x = celldata.x;
                           template.y = celldata.y;
                           this.clearChildren(cell);
@@ -240,7 +240,7 @@ class InfiniteGrid extends LitElement {
               cell.style.left = (x*this.cellWidth)+"px";
 
               if(this.domTemplate != null) {
-                  var template = this.createTemplate(this.domTemplate);
+                  var template = this.createElementFromString(this.domTemplate);
                   template.x = cell.x;
                   template.y = cell.y;
                   cell.appendChild(template);

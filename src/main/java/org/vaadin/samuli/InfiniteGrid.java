@@ -27,6 +27,22 @@ import java.util.stream.Collectors;
  * number of columns without a performance penalty. In practice the max scrollable area depends on browser limitations.
  */
 public class InfiniteGrid extends LitTemplate implements HasSize {
+    public enum HTMLRenderingHints {
+        /**
+         * HTML element will have attributes x and y set on client side.
+         * Using this has a minor performance penalty.
+         */
+        WITH_XY_ATTRIBUTES,
+        /**
+         * Optimization to turn off html support and generate text only content.
+         */
+        TEXT_ONLY,
+        /**
+         *
+         */
+        NORMAL
+    }
+
     private static final int DEFAULT_CELLWIDTH = 200;
     private static final int DEFAULT_CELLHEIGHT = 40;
     private static final int DEFAULT_BUFFER_X = 4;
@@ -43,23 +59,35 @@ public class InfiniteGrid extends LitTemplate implements HasSize {
         dimensions = new Dimensions();
         setCellSize(DEFAULT_CELLWIDTH, DEFAULT_CELLHEIGHT);
         setBufferSize(DEFAULT_BUFFER_X, DEFAULT_BUFFER_Y);
-        setUseDomBind(false);
-        setTextOnly(false);
     }
 
     /**
      * HTML generator to generate cell content with text/html.
-     * When setUseDomBind is set to true x and y coordinates
-     * are provided as polymer data model like [[x]] and [[y]]
      *
      * @param htmlGenerator
+     * @param hints Rendering hints to html generation.
      */
-    public void setHtmlGenerator(BiFunction<Integer, Integer, String> htmlGenerator) {
+    public void setHtmlGenerator(BiFunction<Integer, Integer, String> htmlGenerator,
+                                 HTMLRenderingHints hints) {
         this.htmlGenerator = htmlGenerator;
+        switch (hints) {
+            case WITH_XY_ATTRIBUTES -> {
+                getElement().setProperty("setXYAttributes", true);
+                getElement().setProperty("textOnly", false);
+            }
+            case TEXT_ONLY -> {
+                getElement().setProperty("setXYAttributes", false);
+                getElement().setProperty("textOnly", true);
+            }
+            case NORMAL -> {
+                getElement().setProperty("setXYAttributes", false);
+                getElement().setProperty("textOnly", false);
+            }
+        }
     }
 
     /**
-     * Static Polymer template to be used for all cells. x and y coordinates are provided.
+     * Static Lit template to be used for all cells. x and y coordinates are provided.
      *
      * @param template
      */
@@ -138,25 +166,6 @@ public class InfiniteGrid extends LitTemplate implements HasSize {
         dimensions.setCellCountX(x);
         dimensions.setCellCountY(y);
         getElement().setPropertyBean("dimensions", dimensions);
-    }
-
-    /**
-     * Whether or not html generator supports polymer data model or not.
-     * By default it does not. Having this off is a small optimization.
-     *
-     * @param use
-     */
-    public void setUseDomBind(boolean use) {
-        getElement().setProperty("useDomBind", use);
-    }
-
-    /**
-     * Optimization to turn off html support and generate text only content.
-     *
-     * @param textOnly
-     */
-    public void setTextOnly(boolean textOnly) {
-        getElement().setProperty("textOnly", textOnly);
     }
 
     /**
