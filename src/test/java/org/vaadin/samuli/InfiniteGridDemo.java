@@ -23,7 +23,7 @@ public class InfiniteGridDemo extends Div {
         return "line"+y;
       }
       return x+", "+y;
-    });
+    }, InfiniteGrid.HTMLRenderingHints.NORMAL);
 
     setSizeFull();
     colorGrid.setHeight("500px");
