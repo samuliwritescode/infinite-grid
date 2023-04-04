@@ -104,16 +104,16 @@ class InfiniteGrid extends LitElement {
 
   static get properties() {
       return {
-          dimensions: {type: Object, observer: 'dimensionsChanged'},
+          dimensions: {type: Object},
           textOnly: {type: Boolean},
           setXYAttributes: {type: Boolean}
       }
   }
 
- //TODO: this event handler is too broad. Find a way to observe only dimensions property changes.
-  update() {
-    super.update();
-    this.dimensionsChanged(this.dimensions);
+  updated(changedProperties) {
+    if (changedProperties.get('dimensions')) {
+        this.dimensionsChanged(this.dimensions);
+    }
   }
 
   dimensionsChanged(dimensions) {
