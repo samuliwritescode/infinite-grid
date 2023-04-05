@@ -5,7 +5,7 @@
 
     <groupId>org.vaadin.samuli</groupId>
     <artifactId>infinitegrid</artifactId>
-    <version>1.0.0</version>
+    <version>1.0.2</version>
     <name>InfiniteGrid</name>
     <description>
       InfiniteGrid addon for Vaadin 24+
@@ -52,6 +52,7 @@
         <dependency>
             <groupId>com.vaadin</groupId>
             <artifactId>vaadin-core</artifactId>
+            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>com.fasterxml.jackson.core</groupId>
@@ -127,8 +128,17 @@
             <build>
                 <plugins>
                     <plugin>
-                      <groupId>com.vaadin</groupId>
-                      <artifactId>vaadin-maven-plugin</artifactId>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-jar-plugin</artifactId>
+                        <version>3.2.2</version>
+                        <configuration>
+                            <!-- Generated file that shouldn't be included in add-ons -->
+                            <excludes>
+                                <exclude>
+                                    META-INF/VAADIN/config/flow-build-info.json
+                                </exclude>
+                            </excludes>
+                        </configuration>
                     </plugin>
                     <plugin>
                         <groupId>org.apache.maven.plugins</groupId>
